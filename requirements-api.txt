@@ -1,0 +1,5 @@
+fastapi==0.139.2
+openpyxl==3.1.5
+python-multipart==0.0.27
+tqdm==4.67.1
+uvicorn==0.33.0
