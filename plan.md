@@ -1,7 +1,11 @@
+## Current disposition (2026-10-21)
+CURRENT migration (2026-10-21): the agreed History + change review harvest is implemented in the imported Python port, committed in H: repo `233452a`, and the H: suite passes **516 tests**. **55 Tk-dependent cases skip** because the available Python installs lack a usable Tcl/Tk runtime; run the desktop interaction steps in `test-plan.md` when that runtime is available. Undo/Redo covers accepted File and settings edits with a 50-step bound, document-local stacks, and no automatic persistence. Changes displays a read-only source diff. The Python port stays the product base; `legacy/` remains reference-only. This supersedes the 2026-10-20 execution handoff and 2026-10-17 feature-status block below; their earlier evidence remains historical context.
+
+## Prior progress ledger
 CURRENT grouped mass modification (2026-10-17): structured data now has a By group action beside Mass modify. It builds left-side groups from existing scalar field values, joins .ces references for labels when project context exists, previews a generated restricted formula, and applies multipliers atomically to all or selected Entries; unmatched groups remain unchanged. Evidence: grouped Tk test covers Age 1 ×1.5, Age 2 ×1.25, an unmatched key, preview isolation, and selected-only application; full suite 541 passed, 2 skipped in 66.18s. Operator test is in F:\Documents\dev\rea\.tmp\test-plan.md.
 # CTPEd Python port progress ledger
 
-## Current disposition (2026-10-20)
+## Superseded current disposition (2026-10-20)
 CURRENT migration (2026-10-20): keep the imported Python port as the H: repo base and preserve `legacy/` as reference-only harness code. The agreed harvest scope is History + change review. The implementation now records accepted File and settings edits, bounds history to 50 states, clears it on document changes, and exposes a source diff; copy-save remains unchanged. The staged scratch copy has 12 passing snapshot tests. App-level Tk validation is pending because this Python 3.10 install has no usable Tcl/Tk runtime; run it on H: with the desktop Python before closing migration. This supersedes the 2026-10-17 current status below as an execution handoff, while its feature evidence and open native-parity gates remain historical context.
 
 ## Superseded current disposition (2026-10-17)

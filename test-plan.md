@@ -1,6 +1,6 @@
-﻿# CTPEd Python port: operator test plan
+# CTPEd Python port: operator test plan
 
-CURRENT - 2026-10-20: validate History + change review in the Windows desktop app after install on H:.
+CURRENT - 2026-10-21: validate History + change review in the Windows desktop app on H: when a usable Tcl/Tk runtime is available; the current Python installs skip these UI cases.
 
 1. Open a structured format-1/3 data file, edit a scalar, press Ctrl+Z, and confirm the loaded model returns to its prior value without changing source bytes.
 2. Press Ctrl+Y and confirm the edit returns; make a new edit after Undo and confirm Redo is cleared.
