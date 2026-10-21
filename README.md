@@ -12,6 +12,10 @@ python app.py
 
 The app uses tkinter and needs a desktop Python installation with Tcl/Tk and a graphical session.
 
+## Windows executable
+
+Download the [Windows x64 distribution](releases/CTPEdPython-Windows-x64.zip), extract the archive, and run `CTPEdPython/CTPEdPython.exe`. Keep the extracted folder together; the executable uses the bundled Python and Tcl/Tk runtime. The bundle is built from `CTPEdPython.spec` with Python 3.10 and PyInstaller 6.22.3.
+
 ## Current workflows
 
 - Choose **Open gamefile…** and select the mod's `gamefile.txt` or prefixed `*_gamefile.txt`; bundled default descriptors populate a scrollable **Project files** list without loading all data.
