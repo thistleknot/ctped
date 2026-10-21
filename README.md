@@ -23,6 +23,7 @@ The app uses tkinter and needs a desktop Python installation with Tcl/Tk and a g
 - Edit supported scalar values, including schema-bound nested values; add defaulted entries (including nested defaults when child descriptors are available) and delete selected entries.
 - Edit raw nested blocks as complete source-preserving blocks when their child descriptor is unavailable; these remain outside scalar mass-edit operations.
 - Apply formula mass edits to a field dimension, preview changes, and reference same-file Entries or project data files with recursion-safe source snapshots.
+- Use **Undo**/**Redo** or Ctrl+Z/Ctrl+Y for up to 50 edits in the active data or settings document; **Changes** shows a read-only diff from the loaded source. Save remains an explicit copy operation.
 - Save copies of descriptors, projects, preferences, scripts, templates, or supported data-file edits.
 - Open `.prf`, `.gls`, and `.glt` files; preview supported Great Library template directives, save a selected Entry render as a CP1252 text copy, and preview the separate unit-icon name template's `%n` shortcut.
 
@@ -49,5 +50,5 @@ Run the tests with:
 python -m pytest -q
 ```
 
-Some Tk callback tests skip when the active Python installation lacks Tcl/Tk runtime files. See `plan.md` for current coverage, known gaps, and `test-plan.md` for operator checks.
+Tk callback tests skip when the active Python installation lacks Tcl/Tk runtime files. Run `python -m pytest -q` from this folder; `pytest.ini` keeps the archived harness tests out of collection. See `plan.md` for current coverage and known gaps, and `test-plan.md` for desktop checks.
 

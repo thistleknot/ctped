@@ -43,6 +43,8 @@ GL_GENERATE_UI | Run multi-Entry Great Library generation through actual Tk sele
 PREREQUISITE_SORT | Reuse one Tcl interpreter for real chooser controls and save/reparse Entry order | [mandatory] | R75-R77
 GAMEFILE | Open real gamefile shapes through the button, import/edit/save a selected File | [mandatory] | R78-R80
 IMPORT_COMPAT | Preserve undeclared Gamefile fields and import the bundled structured corpus | [mandatory] | R81
+EDIT_HISTORY | Undo and redo data/settings edits without writing their source | [mandatory] | R103-R108
+CHANGE_REVIEW | Show the active serialization against the loaded source | [mandatory] | R109-R111
 
 R1. WHEN a valid descriptor is loaded, return its format and parsed fields.
 R2. WHEN a matching data file is loaded, return its parsed Entries.
@@ -122,6 +124,12 @@ R100. WHEN unstructured format-0/2 text is mass-modified, show an exact find/rep
 R101. WHEN structured data is active, expose Mass modify beside Entry actions and hide the global copy; WHEN a writable selected-field detail row changes, default its field path in Mass modify; restore the global action for other editable representations.
 R102. WHEN a structured File is grouped by a direct scalar field, show each existing group and its Entry count; resolve reference labels through the declared `.ces` when project context exists, retain unmatched groups, and preview/apply finite multipliers atomically to all or selected Entries while leaving unmapped groups unchanged.
 
+R103-R108. WHEN accepted data or settings edits are undone and redone, restore one prior serialization, refresh the active view, and defer writes to an explicit Save action.
+R106. WHEN another document is opened, clear both history stacks; refreshing or saving the active document preserves them.
+R107. WHEN cancelled, failed, or no-op edits occur, preserve both history stacks.
+R108. WHEN history exceeds 50 states, retain only its newest 50; disable actions for empty stacks and uneditable documents.
+R109-R111. WHEN Changes is opened, show an accurate read-only unified diff from original model bytes, including no-change and newline-only states, without writing data or displaying stale contents.
+
 CLOSED
 - Descriptor/data parser fixtures are hand-authored; project integration and
   exact-copy tests use the private copied `default.ced` sample.
@@ -146,7 +154,7 @@ from unittest.mock import patch
 
 import pytest
 
-from const_values import SETTINGS_FILE_NAMES
+from const_values import ConfigDocument, SETTINGS_FILE_NAMES, parse_config_values
 from app import (
     EditorWindow,
     _editable_field_instances,
@@ -182,6 +190,238 @@ from fields import Fields
 from gl_template import GLTemplate
 from great_library import GreatLibraryFile
 from structure import Structure
+
+
+class TestUndo:
+    """Exercise real data-edit history against synthetic files and one Tk root."""
+
+    @pytest.fixture(scope="class")
+    def undo_root(self):
+        """Require Tk; guarantee one shared interpreter with explicit teardown."""
+        try:
+            root = tk.Tk()
+        except tk.TclError as error:
+            pytest.skip(f"Tcl/Tk runtime unavailable: {error}")
+        root.withdraw()
+        yield root
+        root.destroy()
+
+    @pytest.fixture
+    def undo_window(self, tmp_path: Path, undo_root):
+        """Require Tk; provide isolated source bytes and a complete editor window."""
+        descriptor = tmp_path / "items.ces"
+        source = tmp_path / "items.txt"
+        descriptor.write_bytes(
+            b"0.3 // Version\n#%047%047\n%032%009\n:\n}{\n"
+            b"3 // Format\nf\nValue\tt\tt\tf\t1\n\t0\t\tNULL\n@\n"
+        )
+        source.write_bytes(b"A 10\r\nB 20\r\nC 30\r\n")
+        window = EditorWindow(undo_root)
+        errors = []
+        undo_root.report_callback_exception = lambda *error: errors.append(error)
+        document = load_descriptor(descriptor)
+        window._display(document)
+        window._display_data(load_data_file(document, source))
+        yield window, source
+        assert not errors
+        for child in undo_root.winfo_children():
+            child.destroy()
+
+    @pytest.mark.parametrize("operation", ["scalar", "mass", "add", "delete", "move", "sort"])
+    def test_undo_restores_structured_action(self, undo_window, operation: str) -> None:
+        """Require each edit path; guarantee exact restoration and refreshed rows."""
+        window, source = undo_window
+        original = source.read_bytes()
+        active = window.data_file
+        window.data_list.selection_set("entry-0")
+        window.show_selected_entry()
+        if operation == "scalar":
+            window._select_detail_field_path("Value")
+            with patch("app.simpledialog.askstring", return_value="17"):
+                window.edit_selected_value()
+        elif operation == "mass":
+            window._apply_mass_modification("Value", "multiply", "2", selected_only=False, round_off=False)
+        elif operation == "add":
+            with patch("app.simpledialog.askstring", return_value="EXTRA"):
+                window.add_entry()
+        elif operation == "delete":
+            window.delete_selected_entry()
+        elif operation == "move":
+            window.move_selected_entry(1)
+        else:
+            window.apply_sort("Value", "alpha", False)
+        assert active.to_bytes() != original
+        assert len(window._undo_stack) == 1
+        window.undo_button.invoke()
+        assert window.data_file is active
+        assert active.to_bytes() == original
+        assert len(window.data_list.get_children()) == 3
+        assert [active.entries.item(i).name for i in (1, 2, 3)] == ["A", "B", "C"]
+        assert str(window.undo_button.cget("state")) == tk.DISABLED
+        assert str(window.redo_button.cget("state")) == tk.NORMAL
+        assert source.read_bytes() == original
+        window.redo_button.invoke()
+        assert active.to_bytes() != original
+        assert str(window.undo_button.cget("state")) == tk.NORMAL
+        assert str(window.redo_button.cget("state")) == tk.DISABLED
+        window.undo()
+        window._apply_mass_modification(
+            "Value", "add", "2", selected_only=False, round_off=False
+        )
+        assert not window._redo_stack
+        assert str(window.redo_button.cget("state")) == tk.DISABLED
+
+    @pytest.mark.parametrize("reply", [None, "10", "two words"])
+    def test_cancelled_noop_and_invalid_edits_preserve_history(self, undo_window, reply) -> None:
+        """Require varied non-changes; guarantee unchanged model and history."""
+        window, source = undo_window
+        window.data_list.selection_set("entry-0")
+        window.show_selected_entry()
+        window._select_detail_field_path("Value")
+        with patch("app.simpledialog.askstring", return_value=reply), patch("app.messagebox.showerror"):
+            window.edit_selected_value()
+        assert window.data_file.to_bytes() == source.read_bytes()
+        assert not window._undo_stack
+        assert str(window.undo_button.cget("state")) == tk.DISABLED
+
+    def test_failed_or_noop_mass_edit_preserves_prior_step(self, undo_window) -> None:
+        """Require accepted and rejected batches; guarantee failure cannot consume history."""
+        window, _source = undo_window
+        window._apply_mass_modification("Value", "add", "1", selected_only=False, round_off=False)
+        before = window.data_file.to_bytes()
+        with pytest.raises((ArithmeticError, ValueError)):
+            window._apply_mass_modification("Value", "formula", "value / 0", selected_only=False, round_off=False)
+        window._apply_mass_modification("Value", "multiply", "1", selected_only=False, round_off=False)
+        assert window.data_file.to_bytes() == before
+        assert len(window._undo_stack) == 1
+
+    def test_history_limit_refresh_save_and_document_switch(self, undo_window, tmp_path: Path) -> None:
+        """Require over-limit history; guarantee retention, save stability, and isolation."""
+        window, source = undo_window
+        for _ in range(55):
+            window._apply_mass_modification("Value", "add", "1", selected_only=False, round_off=False)
+        assert len(window._undo_stack) == 50
+        window._display_data(window.data_file)
+        destination = tmp_path / "copy.txt"
+        with patch("app.filedialog.asksaveasfilename", return_value=str(destination)):
+            window.save_data_copy()
+        assert destination.read_bytes() == window.data_file.to_bytes()
+        assert len(window._undo_stack) == 50
+        for _ in range(50):
+            window.undo()
+        assert window.data_file.entries.item(1).field_instances.item(1).value == "15"
+        assert not window._undo_stack
+        window._apply_mass_modification("Value", "add", "1", selected_only=False, round_off=False)
+        window._display_data(load_data_file(window.document, source))
+        assert not window._undo_stack
+        assert not window._redo_stack
+        assert window.data_file.to_bytes() == source.read_bytes()
+
+    @pytest.mark.parametrize("format_number", [0, 2])
+    def test_source_typing_and_replacement_are_undoable(self, undo_window, tmp_path: Path, format_number: int) -> None:
+        """Require both raw formats; guarantee source and replacement edits restore."""
+        window, _source = undo_window
+        descriptor = tmp_path / "raw.ces"
+        suffix = b"0 // Format\n" if format_number == 0 else b"2 // Format\ngl_str.txt\npath\n#\n%009\n"
+        descriptor.write_bytes(b"0.3 // Version\n#%047%047\n%032%009\n:\n}{\n" + suffix)
+        source = tmp_path / "raw.txt"
+        original = b"alpha beta\r\n"
+        source.write_bytes(original)
+        document = load_descriptor(descriptor)
+        window._display(document)
+        window._display_data(load_data_file(document, source))
+        window.raw_data_text.insert("end-1c", "more")
+        window._sync_raw_text()
+        typed = window.data_file.to_bytes()
+        assert typed != original
+        with patch("app.simpledialog.askstring", side_effect=["alpha", "gamma"]), patch("app.messagebox.askyesno", return_value=True):
+            window._mass_modify_raw_text()
+        assert b"gamma" in window.data_file.to_bytes()
+        window.undo()
+        assert window.data_file.to_bytes() == typed
+        window.undo()
+        assert window.data_file.to_bytes() == original
+        assert window.raw_data_text.get("1.0", "end-1c") == "alpha beta\n"
+        assert source.read_bytes() == original
+
+    def test_numeric_edit_formula_and_settings_undo(self, undo_window, tmp_path: Path) -> None:
+        """Require numeric and settings views; guarantee their edit routes record history."""
+        window, _source = undo_window
+        descriptor = tmp_path / "numeric.ces"
+        descriptor.write_bytes(b"0.3 // Version\n#%047%047\n%032%009\n:\n}{\n0 // Format\n")
+        source = tmp_path / "numbers.txt"
+        original = b"FIRST 10\nSECOND 20\nTHIRD 30\n"
+        source.write_bytes(original)
+        document = load_descriptor(descriptor)
+        window._display(document)
+        window._display_data(load_data_file(document, source))
+        window.numeric_value_tree.selection_set("text-value-0")
+        with patch("app.simpledialog.askstring", return_value="19"):
+            window.edit_numeric_text_record()
+        assert b"FIRST 19" in window.data_file.to_bytes()
+        window.undo()
+        assert window.data_file.to_bytes() == original
+        with patch("app.simpledialog.askstring", return_value="value * 2"), patch("app.messagebox.askyesno", return_value=True):
+            window.numeric_value_tree.selection_remove(
+                window.numeric_value_tree.selection()
+            )
+            window._mass_modify_numeric_text()
+        assert window.data_file.to_bytes() == b"FIRST 20\nSECOND 40\nTHIRD 60\n"
+        window.undo()
+        assert window.data_file.to_bytes() == original
+        settings_bytes = b"FOOD_COEFFICIENT 10\n"
+        settings_source = tmp_path / "Const.txt"
+        settings_source.write_bytes(settings_bytes)
+        values = parse_config_values(settings_bytes.decode("cp1252"), "Const.txt")
+        assert values
+        settings = ConfigDocument(str(settings_source), "Const.txt", settings_bytes, values)
+        window._display_settings_document(settings)
+        window.numeric_value_tree.selection_set("setting-0")
+        with patch("app.simpledialog.askstring", return_value="25"):
+            window.edit_numeric_text_record()
+        edited = settings.current_bytes
+        assert edited == b"FOOD_COEFFICIENT 25\n"
+        with patch("app.simpledialog.askstring", return_value="value * 2"), patch("app.messagebox.askyesno", return_value=True):
+            window.config_formula_dialog()
+        assert settings.current_bytes == b"FOOD_COEFFICIENT 50\n"
+        window.undo()
+        assert settings.current_bytes == edited
+        assert len(window._undo_stack) == 1
+        window.undo()
+        assert settings.current_bytes == settings_bytes
+        assert window.settings_document is settings
+        assert window.raw_data_text.get("1.0", "end-1c") == settings_bytes.decode()
+        assert settings_source.read_bytes() == settings_bytes
+
+    def test_ctrl_z_restores_one_step_and_consumes_event(self, undo_window, undo_root) -> None:
+        """Require focused matrix; guarantee a single key event restores one step."""
+        window, source = undo_window
+        window._apply_mass_modification("Value", "add", "1", selected_only=False, round_off=False)
+        once = window.data_file.to_bytes()
+        window._apply_mass_modification("Value", "add", "1", selected_only=False, round_off=False)
+        undo_root.deiconify()
+        undo_root.update()
+        window.data_list.focus_force()
+        window.data_list.event_generate("<Control-z>")
+        undo_root.update()
+        undo_root.withdraw()
+        assert window.data_file.to_bytes() == once
+        assert len(window._undo_stack) == 1
+        assert window.undo() == "break"
+        assert window.data_file.to_bytes() == source.read_bytes()
+
+    def test_uneditable_document_disables_history_actions(self, undo_window) -> None:
+        """Require retained history; guarantee read-only documents cannot restore edits."""
+        window, _source = undo_window
+        window._apply_mass_modification(
+            "Value", "add", "1", selected_only=False, round_off=False
+        )
+        edited = window.data_file.to_bytes()
+        window.editable_file.set(False)
+        window._toggle_file_editable()
+        assert str(window.undo_button.cget("state")) == tk.DISABLED
+        window.undo()
+        assert window.data_file.to_bytes() == edited
 
 
 DESCRIPTORS = [
@@ -276,7 +516,10 @@ def test_gamefile_infers_roots_and_resolves_localized_paths(tmp_path, layout, la
 class TestGamefileWindow:
     @pytest.fixture(scope="class")
     def gamefile_root(self):
-        root = tk.Tk()
+        try:
+            root = tk.Tk()
+        except tk.TclError as error:
+            pytest.skip(f"Tcl/Tk runtime unavailable: {error}")
         root.withdraw()
         yield root
         root.destroy()
@@ -357,11 +600,11 @@ class TestGamefileWindow:
             child.destroy()
 
 
-def test_app_module_compiles_without_starting_a_window() -> None:
+def test_app_module_compiles_without_starting_a_window(tmp_path: Path) -> None:
     """Require app source; guarantee valid syntax; maintain import safety; assert compilation succeeds."""
     source = Path(__file__).parents[1] / "app.py"
 
-    py_compile.compile(str(source), doraise=True)
+    py_compile.compile(str(source), cfile=str(tmp_path / "app.pyc"), doraise=True)
 
 
 @pytest.mark.parametrize(
@@ -787,6 +1030,8 @@ def test_mass_modify_application_targets_selected_entries_without_saving(
             self.value = value
 
     window = EditorWindow.__new__(EditorWindow)
+    window._capture_undo = lambda: None
+    window._push_undo = lambda *_args: None
     window.data_file = data_file
     window.data_list = SelectedRows()
     window.status = Status()
@@ -919,6 +1164,8 @@ def test_mass_modify_selected_only_requires_a_selected_entry(tmp_path: Path) -> 
             return ()
 
     window = EditorWindow.__new__(EditorWindow)
+    window._capture_undo = lambda: None
+    window._push_undo = lambda *_args: None
     window.data_file = data_file
     window.data_list = NoSelection()
     with pytest.raises(ValueError, match="select one or more Entries"):
@@ -1179,6 +1426,8 @@ def test_apply_sort_orders_format3_entries_without_saving(tmp_path: Path) -> Non
 
     displayed: list[object] = []
     window = EditorWindow.__new__(EditorWindow)
+    window._capture_undo = lambda: None
+    window._push_undo = lambda *_args: None
     window.data_file = data_file
     window.status = Status()
     window._display_data = displayed.append
@@ -1233,7 +1482,10 @@ class TestPrerequisiteSort:
     @pytest.fixture(scope="class")
     def sort_root(self):
         """Require working Tk; retain its interpreter for this class and destroy it afterward."""
-        root = tk.Tk()
+        try:
+            root = tk.Tk()
+        except tk.TclError as error:
+            pytest.skip(f"Tcl/Tk runtime unavailable: {error}")
         root.withdraw()
         try:
             yield root
@@ -1869,17 +2121,14 @@ def test_window_edits_nested_format_one_values_and_saves_by_field_path(
         root.destroy()
 
 
-def test_app_loads_and_saves_original_preferences_copy() -> None:
+def test_app_loads_and_saves_original_preferences_copy(tmp_path: Path) -> None:
     source = Path(r"H:\Games\ctp2\CTPEd053\default.prf")
     if not source.is_file():
         pytest.skip("original CTPEd preferences sample is unavailable")
-    destination = source.with_name("default-test-copy.prf")
-    try:
-        preferences = load_preferences(source)
-        save_preferences_copy(preferences, destination)
-        assert destination.read_bytes() == source.read_bytes()
-    finally:
-        destination.unlink(missing_ok=True)
+    destination = tmp_path / "default-test-copy.prf"
+    preferences = load_preferences(source)
+    save_preferences_copy(preferences, destination)
+    assert destination.read_bytes() == source.read_bytes()
 
 
 def test_app_loads_and_saves_original_gl_script_copy(tmp_path: Path) -> None:
@@ -2306,6 +2555,8 @@ def test_project_template_preview_uses_loaded_gl_name(tmp_path: Path) -> None:
     preview = SimpleNamespace()
     status = SimpleNamespace(value="", set=lambda value: setattr(status, "value", value))
     window = EditorWindow.__new__(EditorWindow)
+    window._capture_undo = lambda: None
+    window._push_undo = lambda *_args: None
     window.gl_template = GLTemplate.from_bytes(b"[.GLName]", "preview.glt")
     window.project_view = project_view
     window.template_preview_text = preview
@@ -2331,6 +2582,8 @@ def test_project_template_preview_uses_last_duplicate_gl_name(tmp_path: Path) ->
     preview = SimpleNamespace()
     status = SimpleNamespace(value="", set=lambda value: setattr(status, "value", value))
     window = EditorWindow.__new__(EditorWindow)
+    window._capture_undo = lambda: None
+    window._push_undo = lambda *_args: None
     window.gl_template = GLTemplate.from_bytes(b"[.GLName]", "preview.glt")
     window.project_view = project_view
     window.template_preview_text = preview
@@ -2374,6 +2627,8 @@ def test_raw_nested_edit_callback_stages_valid_text_and_rolls_back_invalid_text(
     )
     status = SimpleNamespace(set=lambda value: setattr(status, "value", value))
     window = EditorWindow.__new__(EditorWindow)
+    window._capture_undo = lambda: None
+    window._push_undo = lambda *_args: None
     window.data_file = SimpleNamespace(
         editable=True,
         to_bytes=lambda: entry.to_text().encode("cp1252"),
@@ -2550,6 +2805,8 @@ def test_project_template_loop_renders_through_preview_callback_without_tk() -> 
     status = SimpleNamespace(set=lambda value: setattr(status, "value", value))
     status.value = ""
     window = EditorWindow.__new__(EditorWindow)
+    window._capture_undo = lambda: None
+    window._push_undo = lambda *_args: None
     window.gl_template = GLTemplate.from_bytes(
         b"[*buildings.ces [.Name]|, ]", "preview-project-loop.glt"
     )
@@ -2620,6 +2877,8 @@ def test_project_consequences_use_only_registered_files_and_preserve_references(
     )
     preview = SimpleNamespace(text="")
     window = EditorWindow.__new__(EditorWindow)
+    window._capture_undo = lambda: None
+    window._push_undo = lambda *_args: None
     window.gl_template = template
     window.project_view = project_view
     window.template_preview_text = preview
@@ -2688,6 +2947,8 @@ def test_window_renders_shipped_consequences_and_database_markers() -> None:
 def test_project_file_import_errors_are_visible_in_preview(monkeypatch) -> None:
     entry = Entry("sample.txt", "SAMPLE", 1, (), FieldInstances())
     window = EditorWindow.__new__(EditorWindow)
+    window._capture_undo = lambda: None
+    window._push_undo = lambda *_args: None
     window.gl_template = GLTemplate.from_bytes(
         b"[*advance.ces [.Name]]", "unreadable-project-loop.glt"
     )
@@ -3137,6 +3398,8 @@ def test_visual_gl_generation_stages_and_saves_only_a_chosen_copy(
             return None
 
     window = EditorWindow.__new__(EditorWindow)
+    window._capture_undo = lambda: None
+    window._push_undo = lambda *_args: None
     window.data_file = advance_file
     window.data_list = SimpleNamespace(
         selection=lambda: (f"entry-{entry_ordinal}",)

@@ -37,6 +37,8 @@ MOVE_ENTRY | Move a selected format-1/3 Entry one row and refresh adjacent move 
 MASS_MODIFY | Apply a representation-appropriate batch edit from the active view's action area | [mandatory] | R47-R49,R98-R100,R101
 GROUP_MODIFY | Apply per-group formulas to a selected structured field using Entry field values and referenced labels | [mandatory] | R102
 SORT | Reorder displayed Entries by field comparison or declared prerequisites | [mandatory] | R74-R77
+UNDO_REDO | Restore accepted edits in either direction with bounded document-local history | [mandatory] | R103-R108
+CHANGE_REVIEW | Compare current serialization with loaded source in a read-only dialog | [mandatory] | R109-R111
 SAVE | Write exact source copies, edited preference rows, or current data-file serialization | [mandatory] | R6,R10,R12,R15,R19,R22,R43-R44,R50
 SERVE | Start the tkinter desktop window | [mandatory] | R7
 
@@ -141,7 +143,21 @@ R100. WHEN arbitrary text mass modification is applied, require a nonempty exact
 R101. WHEN editable format-1/3 data is displayed, place Mass modify beside the Entry actions and hide the global toolbar copy; WHEN a writable scalar detail row is selected, make its exact field path the default mass-modify dimension; WHEN any other representation is active, expose Mass modify in the global toolbar and hide the Entry action copy.
 R102. WHEN grouped modification is opened for structured data, list existing scalar values from a declared grouping field and matching Entry counts; WHEN its descriptor argument names a referenced `.ces`, show the referenced Entry's `Age` value through the project resolver while keeping unmatched keys visible; WHEN one or more finite numeric multipliers are entered, preview and atomically apply the generated conditional formula to all or selected Entries, leaving unmapped groups unchanged and saving only through Save data file.
 
+R103. WHEN an accepted data or settings edit changes serialized bytes, the editor MUST retain its prior state as one Undo step.
+R104. WHEN Undo is activated, restore one prior state without writing a file and make its former state available to Redo.
+R105. WHEN Redo is activated, restore one undone state without writing a file.
+R106. WHEN another document is opened, clear both history stacks; refreshing or saving the active document MUST retain them.
+R107. IF an edit fails, is cancelled, or leaves serialized bytes unchanged, both history stacks MUST remain unchanged.
+R108. WHILE either history stack exceeds UNDO_LIMIT (50), discard its oldest state; disable its action when the stack is empty or the active document is uneditable.
+R109. WHEN Changes is activated for an active File or settings document, show a read-only unified diff between the original loaded bytes and current serialization.
+R110. WHEN loaded and current bytes match, Changes MUST report no edits; WHEN only line endings differ, identify that distinction.
+R111. WHEN Undo or Redo changes the active model, the modal review cannot display stale model data.
+
 CLOSED
+- History is session-local to the active data or settings document; Save remains a separate copy-save operation.
+- Change review uses decoded lines for readability and reports byte differences limited to line endings or the final newline.
+- Undo adapts the legacy CSV editor's bounded snapshot history to the incumbent File and ConfigDocument models; it does not import the Streamlit or pandas runtime. Preferences, GL templates/scripts, and generated GL output have separate document lifecycles and are outside this data-edit history.
+- Change review compares source serialization with the active model using Python's standard library; it creates no temporary or exported files.
 - Format-1/3 scalar values, including schema-bound nested format-1 values, can be edited by field path; raw unbound nested blocks remain read-only.
 - UI controls use a simple layout because recovered form positions are absent.
 - The Entries tab uses a field-by-Entry matrix with a nested-value detail table; bulk operations remain dimension-scoped and use the existing all/selected Entry controls.
@@ -173,6 +189,7 @@ from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
 from functools import cached_property
 import json
+import difflib
 from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
@@ -209,6 +226,9 @@ from const_values import (
     replace_numeric_text_value,
 )
 from formula import evaluate_settings_formula
+
+
+UNDO_LIMIT = 50
 
 
 @dataclass(frozen=True)
@@ -1338,6 +1358,8 @@ class EditorWindow:
         self.root = root
         self.document: Optional[LoadedDescriptor] = None
         self.data_file: Optional[File] = None
+        self._undo_stack: list[tuple[object, str]] = []
+        self._redo_stack: list[tuple[object, str]] = []
         self.settings_document: Optional[ConfigDocument] = None
         self.root.title("CTPEd Python")
         self.root.geometry("1180x760")
@@ -1402,6 +1424,21 @@ class EditorWindow:
             state=tk.DISABLED,
         )
         self.mass_modify_button.pack(side=tk.LEFT, padx=(8, 0))
+        self.undo_button = ttk.Button(
+            toolbar,
+            text="Undo",
+            command=self.undo,
+            state=tk.DISABLED,
+        )
+        self.undo_button.pack(side=tk.LEFT, padx=(8, 0))
+        self.redo_button = ttk.Button(
+            toolbar, text="Redo", command=self.redo, state=tk.DISABLED
+        )
+        self.redo_button.pack(side=tk.LEFT, padx=(8, 0))
+        self.changes_button = ttk.Button(
+            toolbar, text="Changes…", command=self.show_changes, state=tk.DISABLED
+        )
+        self.changes_button.pack(side=tk.LEFT, padx=(8, 0))
         self.editable_file = tk.BooleanVar(value=False)
         self.editable_file_button = ttk.Checkbutton(
             toolbar,
@@ -1639,6 +1676,16 @@ class EditorWindow:
         self.field_value_table.bind(
             "<Button-3>", self._show_field_value_context_menu
         )
+        self.data_list.bind("<Control-z>", self.undo)
+        self.data_list.bind("<Control-y>", self.redo)
+        self.field_value_table.bind("<Control-z>", self.undo)
+        self.field_value_table.bind("<Control-y>", self.redo)
+        self.numeric_value_tree.bind("<Control-z>", self.undo)
+        self.numeric_value_tree.bind("<Control-y>", self.redo)
+        self.raw_data_text.bind("<Control-z>", self.undo)
+        self.raw_data_text.bind("<Control-y>", self.redo)
+        self.root.bind("<Control-z>", self.undo)
+        self.root.bind("<Control-y>", self.redo)
         self.delete_entry_button = ttk.Button(
             self.entry_toolbar,
             text="Delete selected entry",
@@ -3150,7 +3197,7 @@ class EditorWindow:
         )
         return rendered
 
-    def _clear_data_editor(self) -> None:
+    def _clear_data_editor(self, *, clear_undo: bool = True) -> None:
         """Clear active File state and restore the structured-entry view.
 
         Require: the data editor widgets have been constructed.
@@ -3159,6 +3206,8 @@ class EditorWindow:
         Assert: the editable control is disabled.
         """
         self.data_file = None
+        if clear_undo:
+            self._clear_edit_history()
         self.settings_document = None
         self._refresh_gl_targets(None)
         self.editable_file.set(False)
@@ -3193,6 +3242,7 @@ class EditorWindow:
         self.sort_button.configure(state=tk.DISABLED)
         self.edit_numeric_value_button.configure(state=tk.DISABLED)
         self.config_formula_button.configure(state=tk.DISABLED)
+        self.changes_button.configure(state=tk.DISABLED)
         for item in self.numeric_value_tree.get_children():
             self.numeric_value_tree.delete(item)
         assert str(self.editable_file_button.cget("state")) == tk.DISABLED
@@ -3205,9 +3255,11 @@ class EditorWindow:
         Maintain: do not register a descriptor-less file as a structured File.
         Assert: value-row count equals the parsed occurrence count.
         """
-        self._clear_data_editor()
+        self._clear_data_editor(clear_undo=settings is not self.settings_document)
         self.document = None
         self.settings_document = settings
+        self.changes_button.configure(state=tk.NORMAL)
+        self._update_history_controls()
         for item in self.field_list.get_children():
             self.field_list.delete(item)
         self._set_details("Settings values are shown by scoped path; structural headers remain read-only.")
@@ -3238,6 +3290,205 @@ class EditorWindow:
             f"Loaded {settings.source}: {len(settings.values)} editable settings; save changes to a copy."
         )
 
+    def _clear_edit_history(self) -> None:
+        """Forget every Undo and Redo step for the active document.
+
+        Require: the window was constructed.
+        Guarantee: both history stacks are empty and their controls are disabled.
+        Maintain: the active File is unchanged.
+        Assert: Undo and Redo are disabled.
+        """
+        self._undo_stack.clear()
+        self._redo_stack.clear()
+        self.undo_button.configure(state=tk.DISABLED)
+        self.redo_button.configure(state=tk.DISABLED)
+        assert str(self.undo_button.cget("state")) == tk.DISABLED
+        assert str(self.redo_button.cget("state")) == tk.DISABLED
+
+    def _capture_undo(self) -> tuple[object, bytes]:
+        """Capture an isolated data state and its serialized comparison boundary.
+
+        Require: a File or settings document is active and serializable.
+        Guarantee: return the state and exact bytes before an edit.
+        Maintain: leave the active model and history unchanged.
+        Assert: a missing active document raises ValueError.
+        """
+        if self.settings_document is not None:
+            settings = self.settings_document
+            return dict(settings.replacements), settings.current_bytes
+        if self.data_file is None:
+            raise ValueError("no data file is loaded")
+        return self.data_file.snapshot(), self.data_file.to_bytes()
+
+    def _push_undo(self, snapshot: tuple[object, bytes], label: str) -> None:
+        """Record one successful edit only when its serialized bytes changed.
+
+        Require: snapshot came from _capture_undo before an accepted edit.
+        Guarantee: retain at most UNDO_LIMIT prior states; skip no-op edits.
+        Maintain: leave the active model unchanged and persistence deferred.
+        Assert: a recorded change enables Undo.
+        """
+        current = (
+            self.settings_document.current_bytes
+            if self.settings_document is not None
+            else self.data_file.to_bytes()
+        )
+        state, before = snapshot
+        if current == before:
+            return
+        self._undo_stack.append((state, label))
+        self._redo_stack.clear()
+        del self._undo_stack[:-UNDO_LIMIT]
+        self.undo_button.configure(state=tk.NORMAL)
+        self.redo_button.configure(state=tk.DISABLED)
+        assert 0 < len(self._undo_stack) <= UNDO_LIMIT
+
+    def _active_document_editable(self) -> bool:
+        """Return whether the active data or settings document accepts edits.
+
+        Require: the editor window was constructed.
+        Guarantee: report editability for the active File or settings document.
+        Maintain: do not change the model or view.
+        Assert: an absent data document is not editable.
+        """
+        if self.settings_document is not None:
+            return self.settings_document.editable
+        return self.data_file is not None and self.data_file.editable
+
+    def _restore_edit_state(self, snapshot: object, label: str) -> None:
+        """Restore one File snapshot or settings overlay and refresh its view.
+
+        Require: snapshot belongs to the active editable document.
+        Guarantee: restore its state and refresh dependent controls.
+        Maintain: preserve document identity and disk bytes.
+        Assert: visible rows represent the restored model.
+        """
+        if self.settings_document is not None:
+            self.settings_document.replacements = snapshot
+            self._display_settings_document(self.settings_document)
+            self.numeric_value_tree.selection_remove(
+                self.numeric_value_tree.selection()
+            )
+        elif self.data_file is not None and self.data_file.editable:
+            self.data_file.restore(snapshot)
+            self._display_data(self.data_file)
+        else:
+            raise ValueError("no editable data document is active")
+        self.status.set(f"{label}; save a data-file copy to keep the change.")
+
+    def _update_history_controls(self) -> None:
+        """Enable history actions only when their stack contains restorable states.
+
+        Require: the editor and its history buttons have been constructed.
+        Guarantee: button states reflect stack contents and document editability.
+        Maintain: preserve both stacks and the active document.
+        Assert: read-only documents cannot enter either history operation.
+        """
+        editable = self._active_document_editable()
+        self.undo_button.configure(
+            state=tk.NORMAL if editable and self._undo_stack else tk.DISABLED
+        )
+        self.redo_button.configure(
+            state=tk.NORMAL if editable and self._redo_stack else tk.DISABLED
+        )
+
+    def undo(self, _event: object = None) -> str:
+        """Restore one accepted edit toward the loaded source.
+
+        Require: history belongs to the active editable document.
+        Guarantee: restore the newest prior state and expose one Redo step.
+        Maintain: preserve older history, document identity, and disk bytes.
+        Assert: history controls reflect both stacks after restoration.
+        """
+        if self._undo_stack and self._active_document_editable():
+            snapshot, label = self._undo_stack[-1]
+            current, _current_bytes = self._capture_undo()
+            self._restore_edit_state(snapshot, f"Undid {label}")
+            self._redo_stack.append((current, label))
+            self._undo_stack.pop()
+            del self._redo_stack[:-UNDO_LIMIT]
+            self._update_history_controls()
+        return "break"
+
+    def redo(self, _event: object = None) -> str:
+        """Restore one edit reversed by Undo and consume the keyboard event.
+
+        Require: history belongs to the active editable document.
+        Guarantee: restore the newest undone state and expose one Undo step.
+        Maintain: preserve the active document and disk bytes.
+        Assert: history controls reflect both stacks after restoration.
+        """
+        if self._redo_stack and self._active_document_editable():
+            snapshot, label = self._redo_stack[-1]
+            current, _current_bytes = self._capture_undo()
+            self._restore_edit_state(snapshot, f"Redid {label}")
+            self._undo_stack.append((current, label))
+            self._redo_stack.pop()
+            del self._undo_stack[:-UNDO_LIMIT]
+            self._update_history_controls()
+        return "break"
+
+    def show_changes(self) -> None:
+        """Display a read-only difference from the loaded source.
+
+        Require: an active File or settings document can serialize as CP1252.
+        Guarantee: show a unified difference without changing document state.
+        Maintain: keep history and the loaded source bytes unchanged.
+        Assert: the displayed text reflects current model bytes.
+        """
+        if self.settings_document is not None:
+            original = self.settings_document.original_bytes
+            current = self.settings_document.current_bytes
+        elif self.data_file is not None:
+            original = self.data_file.original_bytes
+            current = self.data_file.to_bytes()
+        else:
+            return
+        lines = list(difflib.unified_diff(
+            original.decode("cp1252").splitlines(),
+            current.decode("cp1252").splitlines(),
+            fromfile="Loaded source",
+            tofile="Current edits",
+            lineterm="",
+        ))
+        if not lines:
+            lines = [
+                "No changes since load."
+                if original == current
+                else "Text lines match; line endings or the final newline differ."
+            ]
+        dialog = tk.Toplevel(self.root)
+        dialog.title("Changes since load")
+        dialog.transient(self.root)
+        dialog.geometry("820x540")
+        frame = ttk.Frame(dialog, padding=8)
+        frame.pack(fill=tk.BOTH, expand=True)
+        viewer = tk.Text(frame, wrap=tk.NONE, state=tk.NORMAL)
+        vertical = ttk.Scrollbar(frame, orient=tk.VERTICAL, command=viewer.yview)
+        horizontal = ttk.Scrollbar(frame, orient=tk.HORIZONTAL, command=viewer.xview)
+        viewer.configure(yscrollcommand=vertical.set, xscrollcommand=horizontal.set)
+        viewer.grid(row=0, column=0, sticky="nsew")
+        vertical.grid(row=0, column=1, sticky="ns")
+        horizontal.grid(row=1, column=0, sticky="ew")
+        frame.rowconfigure(0, weight=1)
+        frame.columnconfigure(0, weight=1)
+        viewer.tag_configure("added", foreground="#208040")
+        viewer.tag_configure("removed", foreground="#b03030")
+        for line in lines:
+            tag = (
+                "added" if line.startswith("+") and not line.startswith("+++")
+                else "removed" if line.startswith("-") and not line.startswith("---")
+                else None
+            )
+            viewer.insert(tk.END, line + "\n", tag)
+        viewer.configure(state=tk.DISABLED)
+        ttk.Button(frame, text="Close", command=dialog.destroy).grid(
+            row=2, column=0, sticky="e", pady=(8, 0)
+        )
+        dialog.grab_set()
+        dialog.focus_set()
+        return "break"
+
     def _display_data(self, data_file: File) -> None:
         """Replace the visible data rows after a successful import.
 
@@ -3249,8 +3500,13 @@ class EditorWindow:
         """
         if self.document is None or data_file.structure is not self.document.structure:
             raise ValueError("data file does not match the active descriptor")
+        if data_file is not self.data_file:
+            self._clear_edit_history()
         self.data_file = data_file
         self.settings_document = None
+        self.changes_button.configure(state=tk.NORMAL)
+        # Clear stale ordinals before previews inspect the restored Entry collection.
+        self.data_list.selection_remove(self.data_list.selection())
         self._update_icon_name_preview()
         self.editable_file.set(data_file.editable)
         self.editable_file_button.configure(state=tk.NORMAL)
@@ -3533,11 +3789,13 @@ class EditorWindow:
         except ValueError as error:
             messagebox.showerror("Invalid text values", str(error), parent=self.root)
             return
+        undo_state = self._capture_undo()
         self.raw_data_text.configure(state=tk.NORMAL)
         self.raw_data_text.delete("1.0", tk.END)
         self.raw_data_text.insert("1.0", updated.replace("\r\n", "\n").replace("\r", "\n"))
         self.raw_data_text.configure(state=tk.NORMAL if self.data_file.editable else tk.DISABLED)
         self.data_file.set_raw_text(self.raw_data_text.get("1.0", "end-1c"))
+        self._push_undo(undo_state, "edit numeric values")
         self._populate_numeric_text_table(self.raw_data_text.get("1.0", "end-1c"))
         self.numeric_value_tree.selection_set(f"text-value-{index}")
         self.status.set(f"Edited {record.key}; save the data file copy to keep the change.")
@@ -3595,6 +3853,7 @@ class EditorWindow:
                 if replacement is None:
                     return
             replacements = {value.path: replacement}
+        undo_state = self._capture_undo()
         previous = dict(settings.replacements or {})
         try:
             settings.update(replacements)
@@ -3602,6 +3861,7 @@ class EditorWindow:
             settings.replacements = previous
             messagebox.showerror("Invalid setting value", str(error), parent=self.root)
             return
+        self._push_undo(undo_state, "edit setting")
         self._populate_config_table()
         self.raw_data_text.configure(state=tk.NORMAL)
         self.raw_data_text.delete("1.0", tk.END)
@@ -3689,11 +3949,13 @@ class EditorWindow:
             preview += f"\n… and {len(results) - 8} more"
         if not messagebox.askyesno("Apply formula?", f"Preview ({len(results)} values):\n{preview}\n\nApply all results?", parent=self.root):
             return
+        undo_state = self._capture_undo()
         try:
             settings.update(results)
         except (UnicodeError, ValueError) as error:
             messagebox.showerror("Cannot apply formula", str(error), parent=self.root)
             return
+        self._push_undo(undo_state, "settings formula")
         self._populate_config_table()
         self.raw_data_text.configure(state=tk.NORMAL)
         self.raw_data_text.delete("1.0", tk.END)
@@ -3986,7 +4248,7 @@ class EditorWindow:
         """Keep format-0/2 text edits in the active File model.
 
         Require: an editable format-0/2 File is shown in the raw text widget.
-        Guarantee: retain the widget text for subsequent serialization.
+        Guarantee: retain CP1252 widget text and record one changed state.
         Maintain: leave structured and uneditable Files unchanged.
         Assert: the active File exposes the resulting text.
         """
@@ -3996,7 +4258,14 @@ class EditorWindow:
             and self.data_file.editable
         ):
             text = self.raw_data_text.get("1.0", "end-1c")
+            try:
+                text.encode("cp1252")
+            except UnicodeEncodeError:
+                self.status.set("Text contains characters outside CP1252; the last accepted data is retained.")
+                return
+            undo_state = self._capture_undo()
             self.data_file.set_raw_text(text)
+            self._push_undo(undo_state, "edit source text")
             self._populate_numeric_text_table(
                 text if self.data_file.structure.format == 0 else ""
             )
@@ -4011,6 +4280,7 @@ class EditorWindow:
         """
         if self.settings_document is not None:
             self.settings_document.editable = self.editable_file.get()
+            self._update_history_controls()
             self.mass_modify_button.configure(
                 state=tk.NORMAL if self.settings_document.editable else tk.DISABLED
             )
@@ -4020,6 +4290,7 @@ class EditorWindow:
         if self.data_file is None:
             return
         self.data_file.editable = self.editable_file.get()
+        self._update_history_controls()
         self.mass_modify_button.configure(
             state=tk.NORMAL if self.data_file.editable else tk.DISABLED
         )
@@ -4264,7 +4535,9 @@ class EditorWindow:
         destination = index + direction
         if destination < 0 or destination >= self.data_file.entries.count:
             return
+        undo_state = self._capture_undo()
         entry = self.data_file.move_entry(index + 1, destination + 1)
+        self._push_undo(undo_state, "move entry")
         data_file = self.data_file
         self._display_data(data_file)
         iid = f"entry-{destination}"
@@ -4296,7 +4569,9 @@ class EditorWindow:
         if not selection:
             return
         index = int(selection[0].removeprefix("entry-"))
+        undo_state = self._capture_undo()
         removed = self.data_file.entries.remove(index + 1)
+        self._push_undo(undo_state, "delete entry")
         data_file = self.data_file
         self._display_data(data_file)
         self.status.set(
@@ -4325,6 +4600,7 @@ class EditorWindow:
         )
         if name is None:
             return
+        undo_state = self._capture_undo()
         entry = None
         try:
             entry = self.data_file.add_entry(name)
@@ -4337,6 +4613,7 @@ class EditorWindow:
                     self.data_file.entries.remove(ordinal)
             messagebox.showerror("Cannot add entry", str(error), parent=self.root)
             return
+        self._push_undo(undo_state, "add entry")
         data_file = self.data_file
         self._display_data(data_file)
         iid = f"entry-{data_file.entries.count - 1}"
@@ -4383,7 +4660,9 @@ class EditorWindow:
         }
         if reference_resolver is not None:
             options["reference_resolver"] = reference_resolver
+        undo_state = self._capture_undo()
         count = self.data_file.mass_modify(field_name, operation, operand, **options)
+        self._push_undo(undo_state, "mass modification")
         self._refresh_entry_matrix_values()
         if selected_ordinals:
             self.show_selected_entry()
@@ -4453,7 +4732,9 @@ class EditorWindow:
         except ValueError as error:
             messagebox.showerror("Cannot apply formula", str(error), parent=self.root)
             return
+        undo_state = self._capture_undo()
         data_file.set_raw_text(updated)
+        self._push_undo(undo_state, "numeric mass modification")
         self.raw_data_text.configure(state=tk.NORMAL)
         self.raw_data_text.delete("1.0", tk.END)
         self.raw_data_text.insert("1.0", updated)
@@ -4505,7 +4786,9 @@ class EditorWindow:
                 parent=self.root,
             )
             return
+        undo_state = self._capture_undo()
         data_file.set_raw_text(updated)
+        self._push_undo(undo_state, "text replacement")
         self.raw_data_text.configure(state=tk.NORMAL)
         self.raw_data_text.delete("1.0", tk.END)
         self.raw_data_text.insert("1.0", updated)
@@ -5160,7 +5443,9 @@ class EditorWindow:
         """
         if self.data_file is None:
             raise ValueError("no data file is loaded")
+        undo_state = self._capture_undo()
         count = self.data_file.sort_entries(field_name, method, reverse)
+        self._push_undo(undo_state, "sort entries")
         self._display_data(self.data_file)
         self.show_selected_entry()
         self.status.set(
@@ -5190,11 +5475,13 @@ class EditorWindow:
         def resolve(instance: FieldInstance) -> Entry | None:
             return self.data_file.entries.item_no_error(instance.value)
 
+        undo_state = self._capture_undo()
         count = self.data_file.sort_by_prerequisites(
             preq_field,
             resolve,
             self.choose_entry_dialog if manual else None,
         )
+        self._push_undo(undo_state, "prerequisite sort")
         self._display_data(self.data_file)
         self.show_selected_entry()
         self.status.set(
@@ -5396,6 +5683,7 @@ class EditorWindow:
         )
         if value is None:
             return
+        undo_state = self._capture_undo()
         previous = instance.value
         instance.set_value(value)
         try:
@@ -5404,6 +5692,7 @@ class EditorWindow:
             instance.set_value(previous)
             messagebox.showerror("Invalid field value", str(error), parent=self.root)
             return
+        self._push_undo(undo_state, "edit value")
         self.show_selected_entry(preferred_path=path)
         self.status.set(
             f"Edited {instance.field.name}; save the data file copy to keep the change."
@@ -5424,6 +5713,7 @@ class EditorWindow:
             return False
         if not _is_raw_nested_value(instance):
             raise ValueError("selected field is not a source-spanned raw nested block")
+        undo_state = self._capture_undo()
         previous = instance.value
         instance.set_value(value)
         try:
@@ -5432,6 +5722,7 @@ class EditorWindow:
             instance.set_value(previous)
             messagebox.showerror("Invalid nested block", str(error), parent=self.root)
             return False
+        self._push_undo(undo_state, "edit nested block")
         self.show_selected_entry(preferred_path=path)
         self._refresh_entry_matrix_values()
         self.status.set(

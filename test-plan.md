@@ -1,7 +1,13 @@
-# CTPEd Python port: operator test plan
+﻿# CTPEd Python port: operator test plan
 
-CURRENT - 2026-10-17: the canonical [operator test plan](../../../test-plan.md) contains the API smoke test, exact desktop steps, and final interaction tally.
+CURRENT - 2026-10-20: validate History + change review in the Windows desktop app after install on H:.
 
-Entries matrix scrollbars, Ctrl+A selection, and right-click Edit in both value grids are fixed. `Const.txt` now shows recognized named numeric values in an editable table while retaining its source-text view. Full suite: **508 passed, 1 skipped**; native burndown: **6/9 closed, 3 open**. The operator retest is in the canonical plan linked above.
+1. Open a structured format-1/3 data file, edit a scalar, press Ctrl+Z, and confirm the loaded model returns to its prior value without changing source bytes.
+2. Press Ctrl+Y and confirm the edit returns; make a new edit after Undo and confirm Redo is cleared.
+3. Add an Entry, Undo it, and confirm the visible list and selected-Entry preview refresh without a callback error.
+4. Open format-0/2 text and a supported settings file, edit, Undo, and Redo; confirm the active source file remains unchanged.
+5. Open Changes before edits, after edits, after Undo, and after Redo; confirm the read-only diff matches each current state, then close it and continue editing.
+6. Load another document and confirm both history buttons disable; toggle an active document read-only and confirm Undo/Redo are disabled.
+7. Save an edited copy and confirm the source stays unchanged and history remains available.
 
-The superseded workspace plan is preserved in [.benchmarks/prerequisite-sort-20261016-183109/test-plan.md](.benchmarks/prerequisite-sort-20261016-183109/test-plan.md).
+Automated checks: `python -m pytest -q`; GUI cases require a working Tcl/Tk runtime. Historical operator plan: `test-plan-2026-10-17.md`.

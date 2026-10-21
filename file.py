@@ -14,6 +14,7 @@ ADD_ENTRY | Build and validate a defaulted record before collection insertion | 
 MOVE_ENTRY | Move a structured Entry and serialize its captured source block in the new order | [mandatory] | R22
 MASS_MODIFY | Transform a declared field or exact nested field path as one validated batch | [mandatory] | R21,R25-R28
 FORMULA | Evaluate a safe ECMAScript scalar expression against pre-edit Entry snapshots | [mandatory] | R26-R28
+SNAPSHOT | Capture and restore the complete editable graph while retaining File and Structure identity | [contract] | R29-R32
 SERVE | Return unchanged source bytes and expose File state | [mandatory] | R5-R6
 
 R1. WHEN bytes are imported, retain them exactly and decode only for parsing.
@@ -45,7 +46,13 @@ R26. WHEN formula mass modification is requested, evaluate one allowlisted ECMAS
 R27. WHEN formula expressions read direct or nested fields from the active File or `ref`-resolved project Files, read their values as they exist at Apply start; do not recursively evaluate formulas or dereference reference-valued results. Reject unsupported syntax and unresolved/ambiguous references; pending formulas cannot create dependency cycles.
 R28. WHEN `File.mass_modify` receives an optional progress callback, report completed Entry traversal as `(completed, total)` from zero through the selected Entry count for simple and formula operations; WHEN no callback is supplied, perform no progress output or extra observable work.
 
+R29. WHEN snapshot is called, the File MUST return an isolated copy of its editable Entries, Fields, Comments, source tracking, and raw text.
+R30. WHEN restore receives a snapshot captured by this File, the File MUST serialize to the captured bytes while retaining its identity, Structure, source, editability, and duplicate links.
+R31. WHEN multiple snapshots are restored in reverse order, the File MUST preserve shared Entry identity across its restored collections and comments.
+R32. WHEN a snapshot is restored repeatedly through Undo and Redo, the File MUST reproduce its captured bytes while retaining the File identity.
+
 CLOSED
+- Snapshot state is session-local and opaque; the caller must restore it only to its originating File and consume it once. This is edit history, not a persistence format.
 - `Entries.add` returns an empty Entry, matching its recovered Collection factory contract. `File.add_entry` builds defaults before appending; nested defaults require the retained nested descriptor root. Removal of original Entries deletes their captured source spans; declared counts reflect additions and removals.
 - Formats 0 and 2 use direct text without record parsing; format 0 preserves source line endings and format 2 serializes changed text with CRLF.
 - FileReference is the inferred data-source type; callers may supply another
@@ -60,6 +67,7 @@ match their data files. Failures: decoding, malformed count headers, count
 mismatches, Entry parse failures, and unsupported edits propagate explicitly.
 """
 
+import copy
 from pathlib import Path
 from decimal import Decimal, InvalidOperation, ROUND_HALF_EVEN
 from typing import Callable, Sequence
@@ -264,6 +272,46 @@ class File:
         for duplicate in self.duplicate_files:
             duplicate.editable = value
         assert all(duplicate.editable == value for duplicate in self.duplicate_files)
+
+    def snapshot(self) -> object:
+        """Capture the editable state so ``restore`` can undo later edits.
+
+        Require: File was initialized.
+        Guarantee: return an opaque copy of entries, fields, comments, raw text
+        and original-Entry tracking that later edits cannot change.
+        Maintain: the Structure is shared, not copied; this File is unchanged.
+        Assert: the copy keeps one identity per Entry across all tracked lists.
+        """
+        state = (
+            self.entries,
+            self.fields,
+            self._original_entries,
+            self._generated_entries,
+            self.comments,
+            self._raw_text,
+            self._count_header_present,
+        )
+        return copy.deepcopy(state, {id(self.structure): self.structure})
+
+    def restore(self, snapshot: object) -> None:
+        """Replace the editable state with one captured by ``snapshot``.
+
+        Require: ``snapshot`` came from this File's ``snapshot`` and is used once.
+        Guarantee: entries, fields, comments, raw text and original-Entry
+        tracking equal the captured state, so ``to_bytes`` matches that moment.
+        Maintain: Structure, source, data source and duplicate links are kept.
+        Assert: every stored entry uses the structure's record format.
+        """
+        (
+            self.entries,
+            self.fields,
+            self._original_entries,
+            self._generated_entries,
+            self.comments,
+            self._raw_text,
+            self._count_header_present,
+        ) = snapshot
+        assert all(entry.format == self.structure.format for entry in self.entries)
 
     def add_entry(self, name: str) -> Entry:
         """Build and append a generated Entry from serializable defaults.
