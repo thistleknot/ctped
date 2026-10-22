@@ -1,5 +1,67 @@
 # CTPEd transformation API spec
 
+## Usage
+
+Use workbooks to preview transformations or publish an overlay of changed game files. For the desktop workflow and a complete CLI example, see the [README](../README.md#automate-with-excel-and-cli).
+
+### Start the HTTP service
+
+From the repository folder, create an environment and install its automation dependencies:
+
+```powershell
+python -m venv .venv
+.venv\Scripts\python.exe -m pip install -r requirements-api.txt
+```
+
+Start the service in that environment:
+
+```powershell
+.venv\Scripts\python.exe src/transform_api.py
+```
+
+It listens on `http://127.0.0.1:8765`. The desktop editor runs independently.
+
+### Workbooks
+
+Download blank workbooks while the service is running:
+
+| Workbook | Download | Worksheet and columns, in order |
+| --- | --- | --- |
+| Rules | `GET /v1/transforms/template` | `Rules`: `StructureFile`, `FieldPath`, `Operation`, `Operand` |
+| QA expectations | `GET /v1/transforms/qa-template` | `CTPEdQA`: `StructureFile`, `EntryOrdinal`, `FieldPath`, `Expected` |
+
+In the Rules sheet, `StructureFile` identifies a declared `.ces` file and `FieldPath` names an exact field path. `Operation` is `set`, `concatenate`, `add`, `multiply`, or `formula`; `Operand` contains a literal value or CTPEd formula expression stored as text. These rules apply to all Entries in the target file, in worksheet order. CTPEd does not evaluate Excel formula cells as rules.
+
+A targeted Rules sheet instead uses `StructureFile`, `EntryName`, `FieldPath`, `InputValue`, `Operation`, `Operand`. Each row resolves one unique Entry by name, supplies its mapped input, and applies its operation to that Entry.
+
+The QA sheet identifies each target by structure file, one-based Entry ordinal, and field path. Each `Expected` cell must be an Excel formula with a saved cached result. Recalculate and save the workbook in Excel before submitting it; CTPEd reads those cached values and compares them with its final transformed values. Preview reports mismatches, and apply with QA refuses to publish when a value differs.
+
+### HTTP requests
+
+| Method and endpoint | Result |
+| --- | --- |
+| `GET /health` | Service readiness without loading project files. |
+| `GET /v1/transforms/template` | Blank Rules workbook. |
+| `GET /v1/transforms/qa-template` | Blank QA workbook. |
+| `POST /v1/transforms/preview` | Per-rule counts, samples, changed paths, and QA results; writes no files. |
+| `POST /v1/transforms/apply` | Writes changed files into a new relative-path overlay after validation and any supplied QA pass. |
+
+For preview or apply, send these multipart form fields:
+
+| Field | Required | Value |
+| --- | --- | --- |
+| `workbook` | Yes | Uploaded Rules `.xlsx` file. |
+| `qa_workbook` | No | Uploaded QA `.xlsx` file. |
+| `gamefile_path` | Yes | Local path to the project's gamefile. |
+| `template_path` | Yes | Local path to the matching `.ced` template. |
+| `structure_root` | Yes | Local path to the `Structure` descriptor folder. |
+| `language` | No | Language override; inferred when omitted. |
+| `output_directory` | Apply only | A new output folder outside the source data root, with an existing parent folder. |
+
+Apply preserves the source files and writes only changed files to the overlay. Validation, QA, or serialization failures produce an actionable error and no partial output. Each rule shows an Entry-count `tqdm` progress bar in the service terminal; progress is not streamed to the browser.
+
+The CLI requires both Rules and QA workbooks. It uses the same transformation and comparison logic, exits nonzero on a QA mismatch, and creates no output folder on that failure.
+
 ## Current contract
 
 Add a localhost-only HTTP interface that previews and applies ordered workbook rules through existing CTPEd project and File models. The Tk editor remains available with its existing behavior.
