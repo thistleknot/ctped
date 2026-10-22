@@ -20,7 +20,7 @@ Download the [Windows x64 distribution](releases/CTPEdPython-Windows-x64.zip), e
 
 ### Imported file example
 
-This example uses the supplied `Advance.txt` data and its `advance.ces` structure. Import a declared file, select an Entry to inspect its fields, and make changes in memory before saving a copy.
+Captured in the Windows executable after opening the base gamefile and importing its `Advance.txt` file with the `advance.ces` structure. The selected Entry and editable fields are shown; no values were changed.
 
 ![Example Advance.txt record and the editor's available modifications](docs/images/advance-import-example.png)
 
