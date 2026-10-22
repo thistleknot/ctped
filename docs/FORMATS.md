@@ -336,7 +336,7 @@ The tkinter window opens a `.ces` descriptor, `.ced` project, or `.prf` preferen
 
 - The file chooser belongs to the visual boundary; descriptor/data loading and unchanged-copy saving remain callable functions so the behavior can be checked without opening a window.
 - Directory chooser results and direct explicit relative roots resolve from the process working directory; relative declaration paths without `%s/%c` remain anchored to the `.ced` directory.
-- Start the window with `python app.py`; tkinter is supplied by Python on standard desktop installations.
+- Start the window with `python src/app.py`; tkinter is supplied by Python on standard desktop installations.
 - Loading an invalid descriptor displays an error and keeps the current document intact.
 - Saving a descriptor, project, or unchanged preferences file writes original bytes; saving an unchanged data file writes original bytes, preserving encoding, line endings, comments, and whitespace. Supported format-1/3 edits patch only the selected scalar token; schema-bound nested format-1 edits patch the selected child token through captured parent block spans. Preference flag token patching is available in the model.
 - Loading a new descriptor clears any data file parsed against the old descriptor; parse failure leaves the current view intact.

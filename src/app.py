@@ -1992,7 +1992,7 @@ class EditorWindow:
         )
         if not path:
             return
-        base = Path(__file__).resolve().parent
+        base = Path(__file__).resolve().parent.parent
         template_path = next(
             (candidate for candidate in (base / "default.ced", base / ".private_samples" / "default.ced") if candidate.is_file()),
             None,

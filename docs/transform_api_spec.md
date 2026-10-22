@@ -17,7 +17,7 @@ Add a localhost-only HTTP interface that previews and applies ordered workbook r
 - R9. Apply runs the same sequence against a fresh in-memory project, serializes every loaded File, and stages only changed declared data files under paths relative to the project's inferred data root. Formula reads see already staged earlier worksheet rows; a formula's own batch reads values as of that row's start, matching `File.mass_modify` behavior. No rule is reevaluated.
 - R10. Publish apply output only after every rule and serialization succeeds. Require a new output directory whose parent exists; reject an existing destination and any destination equal to or inside the source data root. Stage in a temporary sibling directory and rename it into place. Leave source Gamefile, descriptors, and data bytes unchanged.
 - R11. Return HTTP 422 with actionable validation/model errors and no partial output. Keep request/response paths relative in results except the caller-supplied output directory.
-- R12. Bind the runnable service to `127.0.0.1` only; do not alter `python app.py` or its manual workflows.
+- R12. Bind the runnable service to `127.0.0.1` only; do not alter `python src/app.py` or its manual workflows.
 - R13. During each API rule, show an Entry-count `tqdm` progress bar in the service terminal; the existing GUI and default model callers have no progress side effects. The bar reports processed Entries, closes on success or error, and is not streamed through HTTP.
 
 ### Closed decisions
@@ -46,4 +46,4 @@ The caller supplies an accessible Gamefile, matching `default.ced`, and Structur
 
 ### Spec validation
 
-The repository has no `.spec/` tree and no available `spec` skill resource, so this spec is checked against the operator-provided Spec-Driven Development Contract. The behavior layer is governed by R1-R12; the structural layer is one new service module with explicit rule/result types and endpoint functions; the sequence and publication transaction are specified in R8-R10; rendered requirements are the module's opening pipeline/EARS front matter; catalog disposition is recorded in `objects.md`. Each R requirement has at least one API or model-level acceptance test planned above. No implementation is authorized by this validation entry alone; implementation follows this current spec in the same task.
+The behavior layer is governed by R1-R12; the structural layer is one service module with explicit rule/result types and endpoint functions; the sequence and publication transaction are specified in R8-R10; rendered requirements are the module's opening pipeline/EARS front matter; catalog disposition is recorded in `docs/objects.md`. Each R requirement has at least one API or model-level acceptance test planned above.

@@ -602,7 +602,7 @@ class TestGamefileWindow:
 
 def test_app_module_compiles_without_starting_a_window(tmp_path: Path) -> None:
     """Require app source; guarantee valid syntax; maintain import safety; assert compilation succeeds."""
-    source = Path(__file__).parents[1] / "app.py"
+    source = Path(__file__).parents[1] / "src" / "app.py"
 
     py_compile.compile(str(source), cfile=str(tmp_path / "app.pyc"), doraise=True)
 

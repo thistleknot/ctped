@@ -7,7 +7,7 @@ This project is a visual Python reimplementation of CTPEd, the Civilization: Cal
 From this folder:
 
 ```powershell
-python app.py
+python src/app.py
 ```
 
 The app uses tkinter and needs a desktop Python installation with Tcl/Tk and a graphical session.
@@ -39,12 +39,12 @@ The HTTP API is an optional local service; it does not replace or change the Tk 
 
 ```powershell
 .venv\Scripts\python.exe -m pip install -r requirements-api.txt
-.venv\Scripts\python.exe transform_api.py
+.venv\Scripts\python.exe src/transform_api.py
 ```
 
 It listens on `127.0.0.1:8765`. Download a blank workbook from `GET /v1/transforms/template`; fill its `Rules` sheet with one row per operation. `StructureFile` must identify a declared `.ces` file, `FieldPath` is the exact field path, `Operation` is `set`, `concatenate`, `add`, `multiply`, or `formula`, and `Operand` is a literal or CTPEd formula expression as text. Rules apply to all Entries, in worksheet order. Excel formula cells are not evaluated.
 
-Send the workbook and project paths as multipart form data to `POST /v1/transforms/preview` or `POST /v1/transforms/apply`. Both require `workbook`, `gamefile_path`, `template_path`, and `structure_root`; `language` is optional. Apply also requires a new `output_directory`. Preview reports per-rule counts and samples without writing files. Apply writes only changed files into a relative-path overlay and leaves the source game files unchanged. Each rule shows an Entry-count `tqdm` bar in the service terminal; progress is not streamed to the browser. See `transform_api_spec.md` for the full contract.
+Send the workbook and project paths as multipart form data to `POST /v1/transforms/preview` or `POST /v1/transforms/apply`. Both require `workbook`, `gamefile_path`, `template_path`, and `structure_root`; `language` is optional. Apply also requires a new `output_directory`. Preview reports per-rule counts and samples without writing files. Apply writes only changed files into a relative-path overlay and leaves the source game files unchanged. Each rule shows an Entry-count `tqdm` bar in the service terminal; progress is not streamed to the browser. See [the API contract](docs/transform_api_spec.md) for the full contract.
 
 ## Verify
 
@@ -54,5 +54,5 @@ Run the tests with:
 python -m pytest -q
 ```
 
-Tk callback tests skip when the active Python installation lacks Tcl/Tk runtime files. Run `python -m pytest -q` from this folder; `pytest.ini` keeps the archived harness tests out of collection. See `plan.md` for current coverage and known gaps, and `test-plan.md` for desktop checks.
+Tk callback tests skip when the active Python installation lacks Tcl/Tk runtime files. Run `python -m pytest -q` from this folder; `pytest.ini` keeps the archived harness tests out of collection. See [the current plan](docs/plan.md) for coverage and known gaps, and [the operator test plan](docs/test-plan.md) for desktop checks.
 
