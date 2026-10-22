@@ -22,7 +22,7 @@ Download the [Windows x64 distribution](releases/CTPEdPython-Windows-x64.zip), e
 
 Captured in the Windows executable after opening the base gamefile and importing its `Advance.txt` file with the `advance.ces` structure. The selected Entry and editable fields are shown; no values were changed.
 
-![Example Advance.txt record and the editor's available modifications](docs/images/advance-import-example.png)
+![CTPEd Python executable with an imported Advance.txt entry and editable fields](docs/images/ctped-imported-advance.png)
 
 For a structured file, you can:
 
@@ -85,4 +85,3 @@ python -m pytest -q
 ```
 
 Tk callback tests skip when the active Python installation lacks Tcl/Tk runtime files. Run `python -m pytest -q` from this folder; `pytest.ini` keeps the archived harness tests out of collection. See [the current plan](docs/plan.md) for coverage and known gaps, and [the operator test plan](docs/test-plan.md) for desktop checks.
-
