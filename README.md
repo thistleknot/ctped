@@ -18,16 +18,30 @@ Download the [Windows x64 distribution](releases/CTPEdPython-Windows-x64.zip), e
 
 ## Current workflows
 
-- Choose **Open gamefile…** and select the mod's `gamefile.txt` or prefixed `*_gamefile.txt`; bundled default descriptors populate a scrollable **Project files** list without loading all data.
+### Imported file example
+
+This example uses the supplied `Advance.txt` data and its `advance.ces` structure. Import a declared file, select an Entry to inspect its fields, and make changes in memory before saving a copy.
+
+![Example Advance.txt record and the editor's available modifications](docs/images/advance-import-example.png)
+
+For a structured file, you can:
+
+- Change an Entry's editable scalar field, such as `Cost`, `Icon`, or `Prerequisites`.
+- Add an Entry with descriptor defaults, delete selected Entries, or reorder Entries.
+- Apply `set`, `concatenate`, `add`, `multiply`, or formula edits to a field; preview results, target selected Entries, and reference same-file or project data safely.
+- Edit schema-bound nested scalar values, or edit a complete raw nested block when its child descriptor is unavailable.
+- Undo or redo up to 50 edits and review the Changes diff before saving a separate copy.
+
+Format-0/2 files support direct text editing and exact text replacement; format-0 numeric records also support numeric mass edits. These operations depend on the file format and descriptor, and read-only or unsupported values remain unavailable for editing.
+
+- Choose **Open gamefile…** and select the mod's `gamefile.txt` or prefixed `*_gamefile.txt`; the Windows bundle includes the default `.ced` template and `Structure` descriptors, so no separate `.ced` is needed. The descriptors populate a scrollable **Project files** list without loading all data.
 - Select a structured row and choose **Import selected file**, then edit and **Save data file…** to a copy; **Check paths** shows missing files and descriptors.
 - Open `.ces` descriptors and inspect fields, flags, defaults, and argument definitions.
 - Open `.ced` projects, inspect declarations, choose roots and language, check every resolved data/structure path without importing, and import one selected declaration.
 - Open matching data files; view and edit format-0/2 direct text or inspect format-1/3 entries.
 - Use the Entries matrix's visible scrollbars to reach every row and field; focus the matrix and press **Ctrl+A** to select all Entries for a selected-only mass edit.
-- Edit supported scalar values, including schema-bound nested values; add defaulted entries (including nested defaults when child descriptors are available) and delete selected entries.
-- Edit raw nested blocks as complete source-preserving blocks when their child descriptor is unavailable; these remain outside scalar mass-edit operations.
-- Apply formula mass edits to a field dimension, preview changes, and reference same-file Entries or project data files with recursion-safe source snapshots.
-- Use **Undo**/**Redo** or Ctrl+Z/Ctrl+Y for up to 50 edits in the active data or settings document; **Changes** shows a read-only diff from the loaded source. Save remains an explicit copy operation.
+- Add defaulted entries, including nested defaults when child descriptors are available; raw nested-block edits stay outside scalar mass-edit operations.
+- Use Ctrl+Z/Ctrl+Y in the active data or settings document; **Changes** shows a read-only diff from the loaded source.
 - Save copies of descriptors, projects, preferences, scripts, templates, or supported data-file edits.
 - Open `.prf`, `.gls`, and `.glt` files; preview supported Great Library template directives, save a selected Entry render as a CP1252 text copy, and preview the separate unit-icon name template's `%n` shortcut.
 
@@ -42,9 +56,25 @@ The HTTP API is an optional local service; it does not replace or change the Tk 
 .venv\Scripts\python.exe src/transform_api.py
 ```
 
-It listens on `127.0.0.1:8765`. Download a blank workbook from `GET /v1/transforms/template`; fill its `Rules` sheet with one row per operation. `StructureFile` must identify a declared `.ces` file, `FieldPath` is the exact field path, `Operation` is `set`, `concatenate`, `add`, `multiply`, or `formula`, and `Operand` is a literal or CTPEd formula expression as text. Rules apply to all Entries, in worksheet order. Excel formula cells are not evaluated.
+It listens on `127.0.0.1:8765`. Download a blank workbook from `GET /v1/transforms/template`; fill its `Rules` sheet with one row per operation. `StructureFile` must identify a declared `.ces` file, `FieldPath` is the exact field path, `Operation` is `set`, `concatenate`, `add`, `multiply`, or `formula`, and `Operand` is a literal or CTPEd formula expression as text. Rules apply to all Entries, in worksheet order. CTPEd does not evaluate Excel formulas.
 
-Send the workbook and project paths as multipart form data to `POST /v1/transforms/preview` or `POST /v1/transforms/apply`. Both require `workbook`, `gamefile_path`, `template_path`, and `structure_root`; `language` is optional. Apply also requires a new `output_directory`. Preview reports per-rule counts and samples without writing files. Apply writes only changed files into a relative-path overlay and leaves the source game files unchanged. Each rule shows an Entry-count `tqdm` bar in the service terminal; progress is not streamed to the browser. See [the API contract](docs/transform_api_spec.md) for the full contract.
+Download a QA template from `GET /v1/transforms/qa-template`. Its `CTPEdQA` sheet has one row for each targeted Entry and field; `Expected` must be an Excel formula with a saved cached result. Recalculate and save the workbook in Excel before the run. CTPEd compares these expected values after all rules. Preview can return mismatches; apply refuses to publish an overlay when any value differs.
+
+Send `workbook`, optional `qa_workbook`, `gamefile_path`, `template_path`, and `structure_root` as multipart fields to `POST /v1/transforms/preview` or `POST /v1/transforms/apply`; `language` is optional. Apply also requires a new `output_directory`. Preview writes no files. Apply writes only changed files into a relative-path overlay and leaves the source game files unchanged. Each rule shows an Entry-count `tqdm` bar in the service terminal; progress is not streamed to the browser.
+
+For a QA-gated command-line run, use the same rule and QA workbooks:
+
+```powershell
+.venv\Scripts\python.exe src/transform_api.py apply `
+  --rules-workbook rules.xlsx `
+  --qa-workbook mom-ctpedit-qa.xlsx `
+  --gamefile "H:\Program Files(x86)\Activision\Call To Power 2\Scenarios\mom\scen0000\default\gamefile.txt" `
+  --template .private_samples/default.ced `
+  --structure-root .private_samples/Structure `
+  --output-directory mom-ctpedit-overlay
+```
+
+The command exits nonzero and creates no output folder on a QA mismatch. The overlay is staged for a generator handoff; CTPEd does not patch the generator-owned scenario directory. See [the API contract](docs/transform_api_spec.md) for the full contract.
 
 ## Verify
 
