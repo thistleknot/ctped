@@ -1,0 +1,27 @@
+//CTP Editor Structure file for agecitystyle.txt by Martin Gühmann
+//Updated by JB
+//For more detailed comments see advance.ces
+
+0.3 //Version number
+
+#%047%047	//Comment charachter in data file
+%032%009	//Delimiter charachters in data file
+		// (use %nnn for ASCII ref)
+:		//Break on right quasi-delimiter
+}{		//Break on left quasi-delimiter
+
+1 //Format
+
+f //Whether this has a number at the top (num of entries)
+f //Whether this has a tree structure
+f //Whether this file references GL entries
+f //Whether this file has entries in gl_str.txt
+f //Whether this file is the GL icon file
+f //Whether this structure file describes formatting of fields
+  // (i.e. whether it has the LBF and LAF columns below)
+
+//Name			Comp	PByDef	AMult	NumArgs
+	//Type		DefaultValue	Comment
+AgeStyle		t	t	t	1
+	agecitystyle.ces	1		City Sprites defination
+@ //End of fields

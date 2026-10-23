@@ -1,0 +1,39 @@
+//CTP Editor SubStructure file
+//For more detailed comments see advance.ces
+
+0.3 //Version number
+
+1 //Format
+
+f //Whether this has a number at the top (num of fields)
+f //Whether this has a tree structure
+f //Whether this file references GL entries
+f //Whether this file has entries in gl_str.txt
+f //Whether this file is the GL icon file
+f //Whether this structure file describes formatting of fields
+  // (i.e. whether it has the LBF and LAF columns below)
+
+//Name			Comp	PByDef	AMult	NumArgs
+	//Type		DefaultValue	Comment
+Score			t	t	f	1
+	0		0		?
+Food			t	t	f	1
+	0		10		Food
+Shield			t	t	f	1
+	0		10		Shields (production)
+Gold			t	t	f	1
+	0		10		Gold (commerce)
+Defense			t	t	f	1
+	0		0		Fractional defense bonus
+Movement		t	t	f	1
+	0		100		Movement cost
+Freight			t	t	f	1
+	0		100		Possibly related to trade route routing
+DeadFood		t	t	f	1
+	0		0		?
+DeadShield		t	t	f	1
+	0		0		?
+DeadGold		t	t	f	1
+	0		0		?
+@ //End of fields
+

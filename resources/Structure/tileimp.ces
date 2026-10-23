@@ -1,0 +1,58 @@
+//CTP Editor Structure file
+//For more detailed comments see advance.ces
+
+0.3 //Version number
+
+#%047%047	//Comment charachter in data file
+%032%009	//Delimiter charachters in data file
+		// (use %nnn for ASCII ref)
+:		//Break on right quasi-delimiter
+}{		//Break on left quasi-delimiter
+
+1 //Format
+
+f //Whether this has a number at the top (num of entries)
+f //Whether this has a tree structure
+t //Whether this file references GL entries
+t //Whether this file has entries in gl_str.txt
+f //Whether the entries have an article
+f //Whether this file is the GL icon file
+f //Whether this structure file describes formatting of fields
+  // (i.e. whether it has the LBF and LAF columns below)
+
+//Name			Comp	PByDef	AMult	NumArgs
+	//Type		DefaultValue	Comment
+Icon			t	t	f	1
+	uniticon.ces	ICON_		Icon
+Tooltip			t	t	f	1
+	0		TOOLTIP_TILEIMP_	String reference of popup tip
+Statusbar			t	t	f	1
+	0		STATUSBAR_TILEIMP_	String reference of statusbar note?
+Level			t	t	f	1
+	0		1		Position on tab?
+Column			f	f	f	1
+	0		1		Position on tab?
+IntBorderRadius		f	f	f	1
+	0		2		?
+SquaredBorderRadius	f	f	f	1
+	0		5		?
+TerraformTerrain	f	f	f	1
+	terrain.ces	TERRAIN_	Terrain to which this imp terraforms
+Class:			t	t	f	1
+	0		Farm:		See Excludes: field
+ConstructionTiles	f	t	t	1
+	0		1		?
+CantBuildOn		f	t	t	1
+	terrain.ces	1		Terrains on which improvement cannot be built
+CanSee:			f	t	t	1
+	0		Standard	Can see units of this vision class
+Excludes:		f	t	t	1
+	0		Farm		Classes which are removed from a square when this built on it
+GLHidden		f	f	f	0	Hides entry in great library
+TerrainEffect		t	t	t	1
+	*tileimpTerrainEffect.ces	0	Effect this improvement has
+@ //End of fields
+
+Icon //Icon field
+DATABASE_TILE_IMPROVEMENTS //GL Database name
+TILEIMP_  //The prefix which identifies this file in gl_str.txt

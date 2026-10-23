@@ -10,4 +10,4 @@ CURRENT - 2026-10-21: validate History + change review in the Windows desktop ap
 6. Load another document and confirm both history buttons disable; toggle an active document read-only and confirm Undo/Redo are disabled.
 7. Save an edited copy and confirm the source stays unchanged and history remains available.
 
-Automated checks: `python -m pytest -q`; GUI cases require a working Tcl/Tk runtime. Historical operator plan: `test-plan-2026-10-17.md`.
+Automated checks: `python -m pytest -q`; GUI cases require a working Tcl/Tk runtime. Historical operator plan: [2026-10-17 handoff](archive/test-plan-2026-10-17.md).

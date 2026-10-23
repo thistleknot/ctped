@@ -1,0 +1,120 @@
+//CTP Editor Structure file
+//For more detailed comments see advance.ces
+
+0.3 //Version number
+
+#%047%047	//Comment charachter in data file
+%032%009	//Delimiter charachters in data file
+		// (use %nnn for ASCII ref)
+:		//Break on right quasi-delimiter
+}{		//Break on left quasi-delimiter
+
+1 //Format
+
+f //Whether this has a number at the top (num of entries)
+f //Whether this has a tree structure
+t //Whether this file references GL entries
+t //Whether this file has entries in gl_str.txt
+t //Whether the entries have an article
+f //Whether this file is the GL icon file
+f //Whether this structure file describes formatting of fields
+  // (i.e. whether it has the LBF and LAF columns below)
+
+//Name			Comp	PByDef	AMult	NumArgs
+	//Type		DefaultValue	Comment
+DefaultIcon		t	t	f	1
+	uniticon.ces	ICON_%n		Icon ID for this Government. Must be a valid Icon ID from UnitIcon.txt
+Description		t	t	f	1
+	0		DESCRIPTION_WONDER_ARISTOTLES_LYCEUM	Not used, but must be a valid string ID
+Movie			t	t	f	1
+	0		MOVIE_WONDER_	Wonder movie
+EnableAdvance		f	t	f	1
+	advance.ces	ADVANCE_	Advance ID that enables this government. Must be a valid Advance ID from Advance.txt
+ObsoleteAdvance		f	f	f	1
+	advance.ces	ADVANCE_	Advance ID that obsoletes this government. Up to 5 Obsolete Advances can be defined. Must be a valid Advance ID from Advance.txt
+ProductionCost		t	t	f	1
+	0		2000		Cost to build
+ReduceReadinessCost	f	f	f	1
+	0		25		Percent reduction in readiness costs
+DecCrimePercent		f	f	f	1
+	0		30		Percent reduction in crime
+IncKnowledgePercent	f	f	f	1
+	0		20		Percent increase in science
+DecEmpireSize		f	f	f	1
+	0		100		Percent reduction to empire size unhappiness
+IncHappinessEmpire	f	f	f	1
+	0		2		Amount to increase happiness in owners cities
+IncConvertedCitiesFeePercent	f	f	f	1
+	0		0		Comment
+GoldPerWaterTradeRoute	f	f	f	1
+	0		15		Gold per trade route of another empire crossing a water tile
+GoldPerTelevision	f	f	f	1
+	0		15		Gold per opponent-controlled television (Buildings with Television flag)
+GoldPerInternationalTradeRoute	f	f	f	1
+	0		25		Gold per trade route between two other empires
+PollutersToParks	f	f	f	1
+	0		3		Number of most polluting cities to destroy as if by CreatePark
+ReduceWorldPollution	f	f	f	1
+	0		0		Comment
+IncreaseBoatMovement	f	f	f	1
+	0		100		Increase to movement of owners boats
+DecreaseMaintenance	f	f	f	1
+	0		0		Comment
+RandomAdvanceChance	f	f	f	1
+	0		0		Comment
+IncreaseHp		f	f	f	1
+	0		0		Increases HP of owners units
+MultiplyTradeRoutes	f	f	f	1
+	0		0		Comment
+IncreaseScientists	f	f	f	1
+	0		5		?
+OtherCivRandomAdvanceChance	f	f	f	1
+	0		0		Comment
+IncreaseProduction	f	f	f	1
+	0		10		Percent production increase
+BonusGold		f	f	f	1
+	0		100		?
+IncreaseFoodAllCities	f	f	f	1
+	0		30		Percent increase to food in owners cities
+TemporaryFullHappiness	f	f	f	1
+	0		5		Turns of celebration in owners cities
+IncreaseSpecialists	f	f	f	1
+	0		0		Comment
+IncreaseCathedrals	f	f	f	1
+	0		0		Comment
+IncreaseBrokerages	f	f	f	1
+	0		50		Percent improvement to buildings with Brokerage flag
+IncreaseRegard		f	f	f	1
+	0		100		Improves other civs regard of the owner
+BuildingEverywhere	f	f	f	1
+	buildings.ces	IMPROVE_	Puts this building in every city. The building can still be built, and the effect remains once the wonder is obsolete.
+PollutionPercent	f	f	f	1
+	0		0		Comment
+PollutionAmount		f	f	f	1
+	0		0		Comment
+EmbassiesEverywhere	f	f	f	0	Owner gets embassies with all civs except those at war with owner
+CloseEmbassies		f	f	f	0	Close other civs embassies with owner
+ReformCities		f	f	f	0	Reforms all cities for free
+FreeSlaves		f	f	f	0	Flees all slaves in all civs, causing unhappiness in civs other than owners
+GlobalRadar		f	f	f	0	Reveals map
+SpiesEverywhere		f	f	f	0	Protects from enemy espionage as if spy in every city
+ProtectFromBiologicalWarfare	f	f	f	0	Protects from enemy biological warfare attacks
+EnableParkRangers	f	f	f	0	Allows construction of park rangers (presumably all units with CreateParks ability) for all civs
+AllCitizensContent	f	f	f	0	Sets happiness in all cities to content (75?)
+EliminateNukes		f	f	f	0	Removes nukes and prevents their construction
+AllBoatsDeepWater	f	f	f	0	Gives MovementType: Sea to all units with MovementType: ShallowWater
+ForcefieldEverywhere	f	f	f	0	Probably obsolete - better to use BuildingEverywhere
+RevoltingCitiesJoinPlayer	f	f	f	0	Cities of other civs which revolt join owner
+NoPollutionUnhappiness	f	f	f	0	Removes all pollution unhappiness
+EmbassiesEverywhereEvenAtWar	f	f	f	0	Owner gets embassies with all civs
+PreventConversion	f	f	f	0	Prevents cleric conversion of owners cities
+ProtectFromBarbarians	f	f	f	0	?
+StartGaiaController	f	f	f	0	Allows end game process
+FreeTradeRoutes		f	f	f	0	? Probably doesn't work - try it
+GLHidden		f	f	f	0	Removes GL entry for this entry
+@ //End of fields
+
+DefaultIcon      //The field which references the GL icon entry in uniticon.txt
+DATABASE_WONDERS //Name of database for GL hyperlinks
+WONDER_          //The prefix which identifies this file in gl_str.txt
+_ARTICLE         //The article suffix

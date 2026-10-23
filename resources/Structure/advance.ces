@@ -1,0 +1,100 @@
+//CTP Editor Structure file
+//This file is the most commented one
+//Same comments apply to other .ces files
+
+//Booleans can be in 0/1 form or t/f form
+//Any string whose first character is a '0' or 'f' is false,
+//any other string is true
+
+0.3 //Version number
+
+#%047%047	//Comment charachter in data file
+%032%009	//Delimiter charachters in data file
+		// (use %nnn for ASCII ref)
+:		//Break on right quasi-delimiter
+}{		//Break on left quasi-delimiter
+
+1 //Format - 0 for none (e.g. Const.txt)
+  //         1 for usual entries and fields (like advance.txt)
+  //         2 for Strings.txt
+  //         3 for entries with just one associated value
+  //           (e.g. sounds.txt)
+
+f //Whether this has a number at the top (num of entries)
+t //Whether this has a tree structure (see below)
+t //Whether this file references GL entries (see below)
+t //Whether this file has entries in gl_str.txt
+//You only need include the following line if the previous is true
+f //Whether the entries have an article
+f //Whether this file is the GL icon file
+t //Whether this structure file describes formatting of fields
+  // (i.e. whether it has the next item and LBF and LAF columns below)
+
+1 //New lines at the start of an entry (between the '{' and the first field instance)
+2 //New lines between each entry
+
+//For each field we have:
+//Comp=Whether field is compulsory in every entry
+//PByDef=Whether field present by default (in newly generated entry)
+//AMult=Whether field may appear repeatedly in same entry
+//LBF=New lines betwen field instances of this type
+//LAF=New lines after the last field instance of this type
+//NumArgs=Number of arguments to field.  Arguments listed below each.
+//Name			Comp	PByDef	AMult	LBF	LAF	NumArgs
+Prerequisites		f	f	t	1	1	1
+	//For each argument we have:
+	//Type=0 for 'ordinary' entry
+	//     *<file name> for sub-structure with file reference
+	//     <file name> for reference to entry of another file
+	//Type		DefaultValue	Comment
+	advance.ces	ADVANCE_	Prerequisite advance(s) for this
+Cost			t	t	f	1	1	1
+	0		20		Advance cost in commerce points
+Icon			t	t	f	1	1	1
+	uniticon.ces	ICON_%n		Icon id
+Branch			f	f	f	1	1	1
+	0		0		Does nothing
+Age			t	t	f	1	1	1
+	age.ces		AGE_ONE		Advance cost in commerce points
+KeyAdvanceAdvice	f	f	f	1	1	1
+	0		KEY_		String id of string displayed in science manager
+PollutionSizeModifier	f	f	f	1	1	1
+	0		1		Pollution modifier to be applied to Population pollution after this advance is discovered. 
+PollutionProductionModifier	f	f	f	1	1	1
+	0		1		Pollution modifier to be applied to Production pollution after this advance is discovered. 
+TriggerFeat		f	f	f	1	1	1
+	feat.ces	FEAT_		Feat ID of a Feat that is accomplished when this Advance is discovered. Must be a valid Feat ID from Feats.txt 
+Capitalization		f	f	f	1	1	0	Comment
+Infrastructure		f	f	f	1	1	0	Comment
+Transform		f	f	f	1	1	0	Comment
+PlantNuke		f	f	f	1	1	0	Comment
+Roads			f	f	f	1	1	0	Comment
+Railroads		f	f	f	1	1	0	Comment
+MagLev			f	f	f	1	1	0	Comment
+Tunnels			f	f	f	1	1	0	Comment
+GLHidden		f	f	f	1	1	0	Comment
+DeepOcean		f	f	f	1	1	0	Comment
+@ //End of fields
+
+Prerequisites	//The defining field of the tree structure
+		//and argument thereof
+		// (include this only if tree structure true above)
+
+//Now list other stuff to be listed in 'consequences':
+//Tags must be distinct
+//Tag	File		Field
+(A)	advance.ces	Prerequisites
+(I)	buildings.ces	EnableAdvance
+(U)	units.ces	EnableAdvance
+(W)	wonder.ces	EnableAdvance
+(G)	govern.ces	EnableAdvance
+(P)	pop.ces		EnableAdvance
+(T)	terrain.ces	AddAdvance
+//It would be nice if this worked:
+//(TI)	tileimp.ces	TerrainEffect.EnableAdvance
+//But it doesn't (yet...)
+@ //End of cross references
+
+Icon  //The field which references the GL icon entry in uniticon.txt
+DATABASE_ADVANCES //Name of database for GL hyperlinks
+ADVANCE_  //The prefix which identifies this file in gl_str.txt

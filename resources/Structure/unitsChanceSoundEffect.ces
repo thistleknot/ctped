@@ -1,0 +1,25 @@
+//CTP Editor SubStructure file
+//For more detailed comments see advance.ces
+
+0.3 //Version number
+
+1 //Format
+
+f //Whether this has a number at the top (num of fields)
+f //Whether this has a tree structure
+f //Whether this file references GL entries
+f //Whether this file has entries in gl_str.txt
+f //Whether this file is the GL icon file
+f //Whether this structure file describes formatting of fields
+  // (i.e. whether it has the LBF and LAF columns below)
+
+//Name			Comp	PByDef	AMult	NumArgs
+	//Type		DefaultValue	Comment
+Chance			t	t	f	1
+	0		0.75	Comment
+Sound			t	t	f	1
+	sounds.ces	SOUND_ID_CAN_SOOTHSAY_TV	Comment
+Effect			t	t	f	1
+	speceffectid.ces	SPECEFFECT_CAN_SOOTHSAY	Comment
+@ //End of fields
+

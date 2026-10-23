@@ -96,7 +96,7 @@ See the [workbook reference and template downloads](docs/transform_api_spec.md#w
    .venv\Scripts\python.exe -m pip install -r requirements-api.txt
    ```
 
-2. Place your rules and QA workbooks in this folder. Extract the Windows distribution here as `CTPEdPython` to supply its `default.ced` and `Structure` folder.
+2. Place your rules and QA workbooks in this folder. The committed `resources/` folder supplies the default `.ced` and `Structure` descriptors; no distribution extraction is needed.
 3. Run the command below, replacing the gamefile path and workbook names with your own:
 
    ```powershell
@@ -104,8 +104,8 @@ See the [workbook reference and template downloads](docs/transform_api_spec.md#w
      --rules-workbook rules.xlsx `
      --qa-workbook expected.xlsx `
      --gamefile "C:\Games\Call To Power 2\ctp2_data\default\gamedata\gamefile.txt" `
-     --template CTPEdPython/default.ced `
-     --structure-root CTPEdPython/Structure `
+     --template resources/default.ced `
+     --structure-root resources/Structure `
      --output-directory ctpedit-overlay
    ```
 
@@ -123,7 +123,7 @@ Use a desktop Python installation with Tcl/Tk and a graphical session:
 python src/app.py
 ```
 
-For **Open gamefile…**, make the default `.ced` template and `Structure` descriptors available from the Windows distribution; the source app prompts for them when they are absent.
+For **Open gamefile…**, the source app and Windows distribution use the committed `.ced` template and `Structure` descriptors in `resources/`.
 
 ### Verify changes
 
@@ -145,3 +145,6 @@ The Windows bundle is built from `CTPEdPython.spec` with Python 3.10 and PyInsta
 - [Feature coverage and known gaps](docs/plan.md)
 - [Desktop operator checks](docs/test-plan.md)
 - [Source layout](docs/source-layout.md)
+- [Documentation index](docs/INDEX.md)
+- [Archived dated notes](docs/archive/)
+- [Ghidra evidence inventory](reference/ghidra/README.md)

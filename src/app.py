@@ -191,6 +191,7 @@ from functools import cached_property
 import json
 import difflib
 from pathlib import Path
+import sys
 import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
 from typing import Callable, Optional, Sequence
@@ -1993,8 +1994,11 @@ class EditorWindow:
         if not path:
             return
         base = Path(__file__).resolve().parent.parent
+        resource_roots = [base / "resources"]
+        if getattr(sys, "frozen", False):
+            resource_roots.insert(0, Path(sys._MEIPASS) / "resources")
         template_path = next(
-            (candidate for candidate in (base / "default.ced", base / ".private_samples" / "default.ced") if candidate.is_file()),
+            (root / "default.ced" for root in resource_roots if (root / "default.ced").is_file()),
             None,
         )
         if template_path is None:

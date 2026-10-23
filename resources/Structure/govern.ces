@@ -1,0 +1,177 @@
+//CTP Editor Structure file
+//For more detailed comments see advance.ces
+
+0.3 //Version number
+
+#%047%047	//Comment charachter in data file
+%032%009	//Delimiter charachters in data file
+		// (use %nnn for ASCII ref)
+:		//Break on right quasi-delimiter
+}{		//Break on left quasi-delimiter
+
+1 //Format
+
+f //Whether this has a number at the top (num of entries)
+f //Whether this has a tree structure
+t //Whether this file references GL entries
+t //Whether this file has entries in gl_str.txt
+f //Whether the entries have an article
+f //Whether this file is the GL icon file
+f //Whether this structure file describes formatting of fields
+  // (i.e. whether it has the LBF and LAF columns below)
+
+//Name			Comp	PByDef	AMult	NumArgs
+	//Type		DefaultValue	Comment
+Icon			t	t	f	1
+	uniticon.ces	ICON_%n		Icon ID for this Government. Must be a valid Icon ID from UnitIcon.txt 
+EnableAdvance		f	t	f	1
+	advance.ces	ADVANCE_	Advance ID that enables this government. Must be a valid Advance ID from Advance.txt 
+ObsoleteAdvance		f	f	f	1
+	advance.ces	ADVANCE_	Advance ID that obsoletes this government. Up to 5 Obsolete Advances can be defined. Must be a valid Advance ID from Advance.txt 
+Rank			t	t	f	1
+	0		0		Integer value used for ranking Governments and giving advice for switching 
+SameRankAdvice		t	t	f	1
+	0		0		String ID of advice string to give if newly discovered Government is of same rank as current government. Must be a valid String ID from one of the string files. 
+HigherRankAdvice	t	t	f	1
+	0		1		String ID of advice string to give if newly discovered Government is of higher rank then current government. Must be a valid String ID from one of the string files. 
+WorkdayExpectation	t	t	f	1
+	0		0		Expected Workday slider setting. Valid values: -2 - 2 
+PositiveWorkdayCoef	t	t	f	1
+	0		1		Happiness modifier for each slider increment above Workday expectation 
+NegativeWorkdayCoef	t	t	f	1
+	0		1		Happiness modifier for each slider increment below Workday expectation 
+WagesExpectation	t	t	f	1
+	0		0		Expected Wages slider setting. Valid values: -2 - 2 
+PositiveWagesCoef	t	t	f	1
+	0		1		Happiness modifier for each slider increment above Wages expectation 
+NegativeWagesCoef	t	t	f	1
+	0		1		Happiness modifier for each slider increment below Wages expectation 
+RationsExpectation	t	t	f	1
+	0		0		Expected Rations slider setting. Valid values: -2 - 2 
+PositiveRationsCoef	t	t	f	1
+	0		1		Happiness modifier for each slider increment above Rations expectation 
+NegativeRationsCoef	t	t	f	1
+	0		1		Happiness modifier for each slider increment below Rations expectation 
+  
+FoodCoef		t	t	f	1
+	0		1		Government modifier to Food collected. Food is multiplied by this number. 
+GoldCoef		t	t	f	1
+	0		1		Government modifier to Gold rate. Gold is multiplied by this number. 
+ProductionCoef		t	t	f	1
+	0		1		Government modifier to Production rate. Production is multiplied by this number. 
+KnowledgeCoef		t	t	f	1
+	0		1		Government modifier to Science rate. Science is multiplied by this number. 
+SupportCoef		t	t	f	1
+	0		1		Government modifier to Support cost. Support cost is multiplied by this number. 
+DefenseCoef		t	t	f	1
+	0		1		Government modifier to City Defense values. Garrisoned unit Defense is multiplied by this number. 
+PollutionCoef		t	t	f	1
+	0		1		Government modifier to Pollution rate. Pollution is multiplied by this number. 
+PollutionUnhappyCoef	t	t	f	1
+	0		1		Unhappiness amount caused by Pollution. Pollution is multiplied by this number to get Unhappiness amount. 
+CrimeCoef		t	t	f	1
+	0		1		Government modifier to Crime rate. Crime is multiplied by this number. 
+CrimeOffset		t	t	f	1
+	0		95		Happiness rate where crime starts. Cities with Happiness over this number will have no crime. 
+  
+ConquestDistress	t	t	f	1
+	0		-5		Happiness penalty caused when a city is captured. 
+ConquestDistressDecay	t	t	f	1
+	0		0.2		Amount Conquest Distress penalty decreases each turn. 
+EmpireDistanceScale	t	t	f	1
+	0		0.001		Coefficient for distance to capital happiness penalty. Distance is multiplied by this value to get penalty 
+MinEmpireDistance	t	t	f	1
+	0		500		Distance below which there is no penalty 
+MaxEmpireDistance	t	t	f	1
+	0		2000		Distance above which the penalty no longer increases 
+TooManyCitiesThreshold	t	t	f	1
+	0		35		Maximum number of cities this government can support without a happiness penalty 
+TooManyCitiesCoefficient	t	t	f	1
+	0		1		Amount of Happiness penalty for each city of the maximum. 
+MaxMartialLawUnits	t	t	f	1
+	0		1		Maximum number of unit that can exert martial law in a city. 
+MartialLawEffect	t	t	f	1
+	0		1		Amount of happiness each martial law unit gives 
+MartialLawThreshold	t	t	f	1
+	0		80		Maximum happiness level attainable through martial law 
+  
+AtHomeRadius		t	t	f	1
+	0		2		Distance from nearest city or fort to be considered "At Home" 
+OverseasCoef		t	t	f	1
+	0		0		Happiness penalty caused by units being away from home. 
+HomeDefeatCoef		t	t	f	1
+	0		1		Happiness penalty caused by units dieing in combat near home. 
+HomeDefeatDecay		t	t	f	1
+	0		0.5		Amount Home Defeat penalty decreases each turn. 
+OverseasDefeatCoef	t	t	f	1
+	0		1		Happiness penalty caused by units dieing in combat away from home. 
+OverseasDefeatDecay	t	t	f	1
+	0		0.5		Amount Oversea Defeat penalty decreases each turn. 
+  
+TurnsToNewReadiness	t	t	f	1
+	0		7		Number of turns for Readiness level changes to take full effect 
+ReadyPeaceCoef		t	t	f	1
+	0		0.5		Support cost coefficient when Readiness level set at Peace 
+ReadyPeaceHP		t	t	f	1
+	0		0.5		Unit hit point coefficient when Readiness level set at Peace 
+ReadyAlertCoef		t	t	f	1
+	0		0.75		Support cost coefficient when Readiness level set at Alert 
+ReadyAlertHP		t	t	f	1
+	0		0.8		Unit hit point coefficient when Readiness level set at Alert 
+ReadyWarCoef		t	t	f	1
+	0		1		Support cost coefficient when Readiness level set at War 
+ReadyWarHP		t	t	f	1
+	0		1		Unit hit point coefficient when Readiness level set at War 
+  
+MaxScienceRate		t	t	f	1
+	0		0.6		Maximum Science setting allowed under this government 
+UnitRushModifier	t	t	f	1
+	0		5		Rush buy multiplier for units 
+BuildingRushModifier	t	t	f	1
+	0		4		Rush buy multiplier for buildings 
+WonderRushModifier	t	t	f	1
+	0		7		Rush but multiplier for wonders 
+EndGameRushModifier	t	t	f	1
+	0		7		Rush buy multiplier for end game objects 
+  
+MaxIncomingTrade	t	t	f	1
+	0		100000		Maximum number of trade routes originating from a city 
+MaxOutgoingTrade	t	t	f	1
+	0		100000		Maximum number of trade routes going to a city 
+InfrastructureCoefficient	t	t	f	1
+	0		0.5		Amount of Public Works created for each Production point when building Infrastructure 
+CapitalizationCoefficient	t	t	f	1
+	0		0.5		Amount of Gold created for each Production point when building Capitalization 
+WarDiscontentMaxUnits	t	t	f	1
+	0		5		Maximum number of unit to be counted towards War Discontent 
+WarDiscontentPerUnit	t	t	f	1
+	0		2		Amount of Unhappiness to be created by each unit 
+  
+GrowthRank		t	t	f	1
+	0		3		Growth rank value from 0 - 5. This number has no actual game effect it is only used for the government comparison panel in the Empire Manager. 
+ProductionRank		t	t	f	1
+	0		3		Production rank value from 0 - 5. This number has no actual game effect it is only used for the government comparison panel in the Empire Manager. 
+ScienceRank		t	t	f	1
+	0		3		Science rank value from 0 - 5. This number has no actual game effect it is only used for the government comparison panel in the Empire Manager. 
+GoldRank		t	t	f	1
+	0		3		Gold rank value from 0 - 5. This number has no actual game effect it is only used for the government comparison panel in the Empire Manager. 
+MilitaryRank		t	t	f	1
+	0		3		Military rank value from 0 - 5. This number has no actual game effect it is only used for the government comparison panel in the Empire Manager. 
+CommerceRank		t	t	f	1
+	0		3		Commerce rank value from 0 - 5. This number has no actual game effect it is only used for the government comparison panel in the Empire Manager. 
+PollutionRank		t	t	f	1
+	0		3		Pollution rank value from 0 - 5. This number has no actual game effect it is only used for the government comparison panel in the Empire Manager. 
+LoyaltyRank		t	t	f	1
+	0		3		National Loyalty rank value from 0 - 5. This number has no actual game effect it is only used for the government comparison panel in the Empire Manager. 
+MartialLawRank		t	t	f	1
+	0		3		Martial Law rank value from 0 - 5. This number has no actual game effect it is only used for the government comparison panel in the Empire Manager. 
+  
+IsEcotopia		f	f	f	0	Flag to set government as Ecotopia 
+GLHidden		f	f	f	0	Flag to cause government to not be displayed in the Great Library 
+ProfessionalUnits	t	t	f	1
+	0		0		This value is not used. 
+@ //End of fields
+
+Icon  //The field which references the GL icon entry in uniticon.txt
+DATABASE_GOVERNMENTS //Name of database for GL hyperlinks
+GOVERNMENT_  //The prefix which identifies this file in gl_str.txt

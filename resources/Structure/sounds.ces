@@ -1,0 +1,20 @@
+//CTP Editor Structure file
+//For more detailed comments see advance.ces
+
+0.3 //Version number
+
+#%047%047	//Comment charachter in data file
+%032%009	//Delimiter charachters in data file
+		// (use %nnn for ASCII ref)
+:		//Break on right quasi-delimiter
+}{		//Break on left quasi-delimiter
+
+3 //Format
+// Format 3 is just a long string of entries with a single value.
+
+f //Whether this has a number at the top (num of entries)
+
+//Name			Comp	PByDef	AMult	NumArgs
+	//Type		DefaultValue	Comment
+FileName		t	t	f	1
+	0		"NULL.WAV"		File name of wav file

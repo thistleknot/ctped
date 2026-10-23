@@ -1,0 +1,31 @@
+//CTP Editor Structure file
+//For more detailed comments see advance.ces
+
+0.3 //Version number
+
+#%047%047	//Comment charachter in data file
+%032%009	//Delimiter charachters in data file
+		// (use %nnn for ASCII ref)
+:		//Break on right quasi-delimiter
+}{		//Break on left quasi-delimiter
+
+1 //Format
+
+t //Whether this has a number at the top (num of entries)
+f //Whether this has a tree structure
+t //Whether this file references GL entries
+t //Whether this file has entries in gl_str.txt
+f //Whether the entries have an article
+f //Whether this file is the GL icon file
+f //Whether this structure file describes formatting of fields
+  // (i.e. whether it has the LBF and LAF columns below)
+
+//Name			Comp	PByDef	AMult	NumArgs
+	//Type		DefaultValue	Comment
+CONCEPT_DEFAULT_ICON	t	t	f	1
+	uniticon.ces	ICON_%n		Icon ID. Must be a valid Icon ID from UnitIcon.txt 
+@ //End of fields
+
+CONCEPT_DEFAULT_ICON  //The field which references the GL icon entry in uniticon.txt
+DATABASE_CONCEPTS //Name of database for GL hyperlinks
+CONCEPT_  //The prefix which identifies this file in gl_str.txt

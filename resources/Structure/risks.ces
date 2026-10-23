@@ -1,0 +1,62 @@
+//CTP Editor Structure file for risks.txt by Martin Gühmann
+//Spelling/grammar changes, updated by JB
+//For more detailed comments see advance.ces
+
+0.3 //Version number
+
+#%047%047	//Comment charachter in data file
+%032%009	//Delimiter charachters in data file
+		// (use %nnn for ASCII ref)
+:		//Break on right quasi-delimiter
+}{		//Break on left quasi-delimiter
+
+1 //Format
+
+t //Whether this has a number at the top (num of entries)
+f //Whether this has a tree structure
+f //Whether this file references GL entries
+f //Whether this file has entries in gl_str.txt
+f //Whether this file is a GL icon file
+f //Whether this structure file describes formatting of fields
+  // (i.e. whether it has the LBF and LAF columns below)
+
+//Name				Comp	PByDef	AMult	NumArgs
+	//Type			DefaultValue	Comment
+BARBARIAN_HUT_CHANCE		t	t	f	1
+	0			1	Probability to find Barbarians in ruins
+MAX_HUT_BARBARIANS		t	t	f	1
+	0			1	Maximum Number of Barbarians you can in ruins
+GOLD_HUT_CHANCE			t	t	f	1
+	0			1	Probability to find some gold in ruins
+MAX_HUT_GOLD			t	t	f	1
+	0			1	Maximum amount of gold pieces you can find in ruins
+ADVANCE_HUT_CHANCE		t	t	f	1
+	0			1	Probability to find an advance in a ruin
+MAX_HUT_ADVANCE_PREREQUISITES	t	t	f	1
+	0			1	Maximum number of prerequisites you need to get a certain advance from a ruin?
+UNIT_HUT_CHANCE			t	t	f	1
+	0			1	Probability to get a unit from a ruin
+MAX_UNIT_PREREQUISITES		t	t	f	1
+	0			1	Maximum number of prerequisites for a certain unit type you need to get it from a ruin?
+CITY_HUT_CHANCE			t	t	f	1
+	0			1	Probability to get a city from a ruin.
+SETTLER_HUT_CHANCE		t	t	f	1
+	0			1	Probability to find a settler in a ruin. Note the sum of all hut chances must not exceed one. If the sum is smaller then one the remainder will be the probability of finding an empty ruin.
+MIN_HUT_GOLD			t	t	f	1
+	0			1	Minimum amount of gold you can find in a ruin.
+BARBARIAN_CHANCE		t	t	f	1
+	0			1	Probability of Barbarians appearing at random
+BARBARIAN_RANK_MAX		t	t	f	1
+	0			1	When choosing barbarian types, all units available to players are looked at.  The best unit that will be considered is the RANK_MAX'th best unit available to anyone (0 meaning the best unit).
+BARBARIAN_RANK_MIN		t	t	f	1
+	0			1	The worst that will be considered is the RANK_MIN'th value is determined solely by attack strength.
+MAX_SPONTANEOUS_BARBARIANS	t	t	f	1
+	0			1	Maxium Barbarian units that can appear at random
+FIRST_BARBARIAN_TURN		t	t	f	1
+	0			1	First possible turn of Barbarian appearance
+LAST_BARBARIAN_TURN		t	t	f	1
+	0			1	Last possible turn of Barbarian appearance
+MINIMUM_BARBARIAN_DISTANCE	t	t	f	1
+	0			1	Minimum Distance of Barbarian appearance to (probably?) the next city
+
+@ //End of fields

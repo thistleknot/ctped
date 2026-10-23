@@ -1,0 +1,46 @@
+//CTP Editor Structure file
+//For citysize.txt by Martin Gühmann
+//Minor changes, updated by JB
+//For more detailed comments see advance.ces
+
+0.3 //Version number
+
+#%047%047	//Comment charachter in data file
+%032%009	//Delimiter charachters in data file
+		// (use %nnn for ASCII ref)
+:		//Break on right quasi-delimiter
+}{		//Break on left quasi-delimiter
+
+1 //Format
+
+f //Whether this has a number at the top (num of fields)
+f //Whether this has a tree structure
+f //Whether this file references GL entries
+f //Whether this file has entries in gl_str.txt
+f //Whether this file is the GL icon file
+f //Whether this structure file describes formatting of fields
+  // (i.e. whether it has the LBF and LAF columns below)
+
+//Name			Comp	PByDef	AMult	NumArgs
+	//Type		DefaultValue	Comment
+Population		t	t	f	1
+	0		0		Minimum population level for this size 
+SquaredRadius		t	t	f	1
+	0		0		Integer value of the squared radius of the area of influence for this city.
+IntRadius		t	t	f	1
+	0		0		Integer value of the radius of the area of influence for this city. NOTE: IntRadius & SquaredRadius are used for quick calculation of the area of influence of a city. These numbers can cause strange effect when not configured correctly, change them with caution.
+MaxWorkers		t	t	f	1
+	0		0		Maximum number of workers needed to collect all resources from this size influence ring 
+GrowthRate		t	t	f	1
+	0		75		Value used in the growth rate calculations 
+MinGrowthRate		t	t	f	1
+	0		2500		Value used in the starvation calculations 
+MaxSurplusFood		t	t	f	1
+	0		250		Maximum amount of excess food to be used in growth calculations 
+BaseOvercrowding	t	t	f	1
+	0		4		Population level where overcrowding starts to take effect. Overcrowding causes growth rate to decrease. NOTE: Buildings will usually increase this number and should not be increased in increase size settings. 
+BaseMaxPop		t	t	f	1
+	0		18		Maximum population of the city. NOTE: Buildings will usually increase this number and should not be increased in increase size settings. 
+VisionRadius		t	t	f	1
+	0		1.414		Floating point value of the vision radius of this city (usually the suare root IntRadius)
+@ //End of fields

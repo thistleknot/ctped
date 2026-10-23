@@ -1,0 +1,217 @@
+//CTP Editor Structure file
+//For more detailed comments see advance.ces
+
+0.3 //Version number
+
+#%047%047	//Comment charachter in data file
+%032%009	//Delimiter charachters in data file
+		// (use %nnn for ASCII ref)
+:		//Break on right quasi-delimiter
+}{		//Break on left quasi-delimiter
+
+1 //Format
+
+f //Whether this has a number at the top (num of entries)
+f //Whether this has a tree structure
+t //Whether this file references GL entries (see below)
+t //Whether this file has entries in gl_str.txt
+f //Whether the entries have an article
+f //Whether this file is the GL icon file
+f //Whether this structure file describes formatting of fields
+  // (i.e. whether it has the LBF and LAF columns below)
+
+//Name			Comp	PByDef	AMult	NumArgs
+	//Type		DefaultValue	Comment
+Description		t	t	f	1
+	0		DESCRIPTION_UNIT_WARRIOR	Comment
+DefaultIcon		t	t	f	1
+	uniticon.ces	ICON_%n		Comment
+DefaultSprite		t	t	f	1
+	0		SPRITE_WARRIOR	Comment
+Category		t	t	f	1
+	0		UNIT_CATEGORY_ATTACK	Comment
+Attack			t	t	f	1
+	0		20	Comment
+Defense			t	t	f	1
+	0		10	Comment
+ZBRangeAttack		t	t	f	1
+	0		0	Comment
+Firepower		t	t	f	1
+	0		1	Comment
+Armor			t	t	f	1
+	0		1	Comment
+MaxHP			t	t	f	1
+	0		10	Comment
+ShieldCost		t	t	f	1
+	0		225	Comment
+PowerPoints		t	t	f	1
+	0		100	Comment
+ShieldHunger		t	t	f	1
+	0		2	Comment
+FoodHunger		t	t	f	1
+	0		0	Comment
+MaxMovePoints		t	t	f	1
+	0		100	Comment
+VisionRange		t	t	f	1
+	0		1	Comment
+GovernmentType		f	f	t	1
+	govern.ces	GOVERNMENT_	Comment
+EnableAdvance		f	t	f	1
+	advance.ces	ADVANCE_	Comment
+ObsoleteAdvance		f	t	t	1
+	advance.ces	ADVANCE_	Comment
+BombRounds		f	f	f	1
+	0		10		Comment
+BombardRange		f	f	f	1
+	0		1		Comment
+CanCounterBombard	f	f	f	0	Comment
+ActiveDefenseRange	t	t	f	1
+	0		0	Comment
+ActiveDefenseOnlyWhenCarryingEnablers	f	f	f	0	Comment
+MaxFuel			t	t	f	1
+	0		0	Comment
+DefendAgainstSpies	f	f	f	1
+	0		0.5	Comment
+SettleCityType		f	f	f	1
+	units.ces	UNIT_CITY	Comment
+SettleSize		f	f	f	1
+	0		1	Comment
+SettleBuilding		f	f	t	1
+	buildings.ces	IMPROVE_	Comment
+SpaceLaunch		f	f	f	1
+	0		3	Comment
+SoundSelect1		t	t	f	1
+	sounds.ces	SOUND_SELECT1_WARRIOR	Comment
+SoundSelect2		t	t	f	1
+	sounds.ces	SOUND_SELECT2_WARRIOR	Comment
+SoundMove		t	t	f	1
+	sounds.ces	SOUND_MOVE_WARRIOR	Comment
+SoundAcknowledge	t	t	f	1
+	sounds.ces	SOUND_ACKNOWLEDGE_WARRIOR	Comment
+SoundCantMove		t	t	f	1
+	sounds.ces	SOUND_CANTMOVE_WARRIOR	Comment
+SoundAttack		t	t	f	1
+	sounds.ces	SOUND_ATTACK_WARRIOR	Comment
+SoundWork		t	t	f	1
+	sounds.ces	SOUND_WORK_WARRIOR	Comment
+SoundVictory		t	t	f	1
+	sounds.ces	SOUND_VICTORY_WARRIOR	Comment
+SoundDeath		t	t	f	1
+	sounds.ces	SOUND_DEATH_WARRIOR	Comment
+CanAttack:		f	t	t	1
+	0		Land	Comment
+CanBombard:		f	f	t	1
+	0		Land	Comment
+CanCarry:		f	f	t	1
+	0		SmallLand	Comment
+CanSee:			f	t	t	1
+	0		Standard	Comment
+Defend:			f	f	t	1
+	0		Air	Comment
+MovementType:		f	t	t	1
+	0		Land	Comment
+Settle:			f	t	t	1
+	0		Land	Comment
+Size:			t	t	f	1
+	0		Small	Comment
+VisionClass:		t	t	f	1
+	0		Standard	Comment
+WoodenShip		f	f	f	0	Comment
+AttackWoodenShipBonus	f	f	f	0	Comment
+WoodenShipBonus		f	f	f	1
+	0		0.25	Comment
+IsMounted		f	f	f	0	Comment
+BonusAgainstMounted	f	f	f	0	Comment
+MountedBonus		f	f	f	1
+	0		0.5	Comment
+LossMoveToDmgNone	f	t	f	0	Comment
+NoFuelThenCrash		f	f	f	0	Comment
+CanEntrench		f	t	f	0	Comment
+CanExpel		f	t	f	0	Comment
+CanPillage		f	t	f	0	Comment
+CanPirate		f	t	f	0	Comment
+CanBeachAssault		f	f	f	0	Comment
+CanBeExpelled		f	f	f	0	Comment
+CanSue			f	f	f	0	Comment
+CanBeSued		f	f	f	0	Comment
+ExertsMartialLaw	f	t	f	0	Comment
+DeathEffectsHappy	f	t	f	0	Comment
+IgnoreZOC		f	f	f	0	Comment
+NoZoc			f	f	f	0	Comment
+OnlyBuildOne		f	t	f	0	Comment
+CantBuild		f	f	f	0	Comment
+BuildingRemovesAPop	f	f	f	0	Comment
+CantCaptureCity		f	f	f	0	Comment
+NoSlaves		f	f	f	0	Comment
+VictoryEnslavement	f	f	f	0	Comment
+IsSpecialForces		f	f	f	0	Comment
+Civilian		f	f	f	0	Comment
+Advertise		f	f	f	0	Comment
+SingleUse		f	f	f	0	Comment
+EnableCarrierDefenses	f	f	f	0	Comment
+IsSubmarine		f	f	f	0	Comment
+IsFlanker		f	f	f	0	Comment
+Paratrooper		f	f	f	0	Comment
+IsTelevangelist		f	f	f	0	Comment
+EstablishEmbassy	f	f	f	0	Comment
+ThrowParty		f	f	f	0	Comment
+Explodes		f	f	f	0	Comment
+ParatrooperTransport	f	f	f	0	Comment
+IsTrader		f	f	f	0	Comment
+NoIndex			f	f	f	0	Comment
+GLHidden		f	f	f	0	Comment
+NeedsNoSupport		f	f	f	0	Comment
+HasPopAndCanBuild	f	f	f	0	Comment
+CityGrowthCoefficient	f	f	f	1
+	0			0.5	Comment
+CanReform		f	t	f	1
+	*unitsSoundEffect.ces	0	Comment
+CargoData		f	f	f	1
+	*unitsCargo.ces		0	Comment
+CanInjoin		f	t	f	1
+	*unitsSoundEffect.ces	0	Comment
+CreateFranchise		f	t	f	1
+	*unitsChanceSoundEffect.ces	0	Comment
+CauseUnhappiness	f	t	f	1
+	*unitsCauseUnhapp.ces	0	Comment
+CanSoothsay		f	t	f	1
+	*unitsSoundEffect.ces	0	Comment
+IndulgenceSales		f	t	f	1
+	*unitsSoundEffect.ces	0	Comment
+ConvertCities		f	t	f	1
+	*unitsChanceDeathSoundEffect.ces	0	Comment
+AssasinateRuler		f	t	f	1
+	*unitsChanceEliteDeath.ces	0	Comment
+NanoTerror		f	t	f	1
+	*unitsChanceSoundEffect.ces	0	Comment
+BioTerror		f	t	f	1
+	*unitsChanceSoundEffect.ces	0	Comment
+Plague			f	t	f	1
+	*unitsChanceSoundEffect.ces	0	Comment
+SettlerSlaveRaids	f	t	f	1
+	*unitsSoundEffect.ces	0	Comment
+SlaveRaids		f	t	f	1
+	*unitsSlaveRaids.ces	0	Comment
+SlaveUprising		f	t	f	1
+	*unitsSoundEffect.ces	0	Comment
+UndergroundRailway	f	t	f	1
+	*unitsChanceDeathSoundEffect.ces	0	Comment
+NuclearAttack		f	t	f	1
+	*unitsSoundEffect.ces	0	Comment
+InciteRevolution	f	t	f	1
+	*unitsRevolution.ces	0	Comment
+InvestigateCity		f	t	f	1
+	*unitsChanceEliteDeath.ces	0	Comment
+PlantNuke		f	t	f	1
+	*unitsPlantNuke.ces	0	Comment
+StealTechnology		f	t	f	1
+	*unitsStealTech.ces	0	Comment
+CreateParks		f	t	f	1
+	*unitsSoundEffect.ces	0	Comment
+Revolution		f	t	f	1
+	*unitsSoundEffect.ces	0	Comment
+@ //End of fields
+
+DefaultIcon //GL Icon field
+DATABASE_UNITS //Name of database for GL hyperlinks
+UNIT_*>ORDER  //The prefix which identifies this file in gl_str.txt

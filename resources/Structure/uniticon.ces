@@ -1,0 +1,45 @@
+//CTP Editor Structure file
+//For more detailed comments see advance.ces
+
+0.3 //Version number
+
+#%047%047	//Comment charachter in data file
+%032%009	//Delimiter charachters in data file
+		// (use %nnn for ASCII ref)
+:		//Break on right quasi-delimiter
+}{		//Break on left quasi-delimiter
+
+1 //Format
+
+f //Whether this has a number at the top (num of entries)
+f //Whether this has a tree structure
+f //Whether this file references GL entries
+f //Whether this file has entries in gl_str.txt
+t //Whether this file is the GL icon file
+f //Whether this structure file describes formatting of fields
+  // (i.e. whether it has the LBF and LAF columns below)
+
+//Name			Comp	PByDef	AMult	NumArgs
+	//Type		DefaultValue	Comment
+FirstFrame		t	t	f	1
+	0		"UPAP001L.TGA"	Comment
+Movie			t	t	f	1
+	0		"NULL"	Comment
+Gameplay		t	t	f	1
+	0		"%n_GAMEPLAY"	Comment
+Historical		t	t	f	1
+	0		"%n_HISTORICAL"	Comment
+Prereq			t	t	f	1
+	0		"%n_PREREQ"	Comment
+Vari			t	t	f	1
+	0		"%n_STATISTICS"	Comment
+Icon			t	t	f	1
+	0		"UPAP001L.TGA"	Comment
+LargeIcon		t	t	f	1
+	0		"NULL"	Comment
+SmallIcon		t	t	f	1
+	0		"NULL"	Comment
+StatText		t	t	f	1
+	0		"%n_SUMMARY"	Comment
+@ //End of fields
+

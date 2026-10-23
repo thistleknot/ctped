@@ -1,0 +1,49 @@
+//CTP Editor SubStructure file
+//For more detailed comments see advance.ces
+
+0.3 //Version number
+
+1 //Format
+
+f //Whether this has a number at the top (num of fields)
+f //Whether this has a tree structure
+f //Whether this file references GL entries
+f //Whether this file has entries in gl_str.txt
+f //Whether this file is the GL icon file
+f //Whether this structure file describes formatting of fields
+  // (i.e. whether it has the LBF and LAF columns below)
+
+//Name			Comp	PByDef	AMult	NumArgs
+	//Type		DefaultValue	Comment
+Terrain			f	t	t	1
+	terrain.ces	TERRAIN_	Terrains to which this effect applies
+BonusFood		f	f	f	1
+	0		10		Production added
+BonusProduction		f	f	f	1
+	0		10		Production added
+BonusGold		f	f	f	1
+	0		10		Production added
+Airport			f	f	f	0	Refuels planes
+Radar			f	f	f	0	?
+ListeningPost		f	f	f	0	?
+VisionRange		f	f	f	1
+	0		3		Vision range in squares
+RadarRange		f	f	f	1
+	0		3		Radar range - units within range appear on minimap
+DefenseBonus		f	f	f	1
+	0		0.5		Fractional bonus to defense
+MoveCost		f	f	f	1
+	0		20		Reduces move cost to this value
+EnableAdvance		f	t	f	1
+	advance.ces	ADVANCE_	Advance required to build on this terrain
+ObsoleteAdvance		f	t	f	1
+	advance.ces	ADVANCE_	Advance required to build on this terrain
+ProductionCost		f	t	f	1
+	0		500		PW required to build
+ProductionTime		f	t	f	1
+	0		2		Time required to build
+TilesetIndex		t	t	f	1
+	0		1		Index in tile file
+Endgame			f	f	f	0	?
+@ //End of fields
+

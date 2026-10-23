@@ -1,0 +1,55 @@
+//CTP Editor Structure file
+//For more detailed comments see advance.ces
+
+0.3 //Version number
+
+#%047%047	//Comment charachter in data file
+%032%009	//Delimiter charachters in data file
+		// (use %nnn for ASCII ref)
+:		//Break on right quasi-delimiter
+}{		//Break on left quasi-delimiter
+
+1 //Format
+
+f //Whether this has a number at the top (num of entries)
+f //Whether this has a tree structure
+t //Whether this file references GL entries
+t //Whether this file has entries in gl_str.txt
+f //Whether the entries have an article
+f //Whether this file is the GL icon file
+f //Whether this structure file describes formatting of fields
+  // (i.e. whether it has the LBF and LAF columns below)
+
+//Name			Comp	PByDef	AMult	NumArgs
+	//Type		DefaultValue	Comment
+TilesetIndex		t	t	f	1
+	0		1		Index in the *.til files
+Icon			t	t	f	1
+	uniticon.ces	ICON_%n		Icon ID. Must be a valid Icon ID from UnitIcon.txt
+InternalType:		t	t	f	1
+	0		Forest		?
+AddAdvance		f	t	f	1
+	advance.ces	ADVANCE_	Advance to add terrain
+TransformAdd		f	t	f	1
+	*terrainTransform.ces	0	Info about transforming to this terrain
+RemoveAdvance		f	t	f	1
+	advance.ces	ADVANCE_	Advance to add terrain
+TransformRemove		f	t	f	1
+	*terrainTransform.ces	0	Info about transforming from this terrain
+EnvBase			t	t	f	1
+	*terrainEnvBase.ces	0	Base resources
+EnvCity			t	t	f	1
+	*terrainEnv.ces	0		Resources with city (unsure whether cumulative)
+EnvRiver		f	t	f	1
+	*terrainEnv.ces	0		Resources with river (cumulative)
+Resources		f	f	t	1
+	goods.ces	TERRAIN_	Resources found on this terrain
+MovementType:		f	t	t	1
+	0		Air		Movement types applicable to this terrain
+CanDie			f	t	f	0	Can this terrain die due to pollution
+GLHidden		f	f	f	0	Removes GL entry
+@ //End of fields
+
+Icon  //The field which references the GL icon entry in uniticon.txt
+DATABASE_TERRAIN //Name of database for GL hyperlinks
+TERRAIN_*>GOOD  //The prefix which identifies this file in gl_str.txt

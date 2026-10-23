@@ -1,0 +1,18 @@
+//CTP Editor Structure file
+//For more detailed comments see advance.ces
+
+0.3 //Version number
+
+#		//Comment charachter in data file
+%032%009	//Delimiter charachters in data file
+		// (use %nnn for ASCII ref)
+:		//Break on right quasi-delimiter
+}{		//Break on left quasi-delimiter
+
+2 //Format - Strings.txt
+
+gl_str.txt //Name of gl_str.txt, should be a substring of the name
+           // of any project's gl_str.  e.g. PRJ_gl_str.txt
+%c%l\gamedata\       //Path to gl_str.txt
+#    //gl_str comment char
+%009 //gl_str delimiter char (%nnn for ASCII ref)

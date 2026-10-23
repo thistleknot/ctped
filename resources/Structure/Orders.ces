@@ -1,0 +1,102 @@
+//CTP Editor Structure file for Orders.txt by Martin Gühmann
+//Some spelling/grammar errors corrected, updated by JB
+//For more detailed comments see advance.ces
+
+0.3 //Version number
+
+#%047%047	//Comment charachter in data file
+%032%009	//Delimiter charachters in data file
+		// (use %nnn for ASCII ref)
+:		//Break on right quasi-delimiter
+}{		//Break on left quasi-delimiter
+
+1 //Format
+
+f //Whether this has a number at the top (num of entries)
+f //Whether this has a tree structure (see below)
+t //Whether this file references GL entries (see below)
+t //Whether this file has entries in gl_str.txt
+//You only need include the following line if the previous is true
+f //Whether the entries have an article
+f //Whether this file is the GL icon file
+f //Whether this structure file describes formatting of fields
+  // (i.e. whether it has the LBF and LAF columns below)
+
+//Name			Comp	PByDef	AMult	NumArgs
+Gold			t	t	f	1
+	//Type		DefaultValue	Comment
+	0		0		Comment
+Move			t	t	f	1
+	0		100		Comment
+EventName		t	t	f	1
+	0		""		A slic event
+GLHidden		f	f	f	0	Comment
+LocalizedName		t	t	f	1
+	0		str_ldl_order_		String reference in str_loc.txt
+StatusText			t	t	f	1
+	0		str_ldl_order_		String reference in str_loc.txt
+TargetPretest:		t	t	f	1
+	0		None		Comment
+UnitPretest_None			f	t	f	0	Must be removed if you use another UnitPretest_
+UnitPretest_CanAttack			f	f	f	0	All these unit pretests are alternatives for the first one
+UnitPretest_CanEntrench			f	f	f	0	Comment
+UnitPretest_CanSueFranchise		f	f	f	0	Comment
+UnitPretest_CanSue			f	f	f	0	Comment
+UnitPretest_CanCreateFranchise		f	f	f	0	Comment
+UnitPretest_CanInvestigateCity		f	f	f	0	Comment
+UnitPretest_CanBombard			f	f	f	0	Comment
+UnitPretest_CanSettle			f	f	f	0	Comment
+UnitPretest_CanStealTechnology		f	f	f	0	Comment
+UnitPretest_CanInciteRevolution		f	f	f	0	Comment
+UnitPretest_CanAssassinateRuler		f	f	f	0	Comment
+UnitPretest_CanExpel			f	f	f	0	Comment
+UnitPretest_EstablishEmbassy		f	f	f	0	Comment
+UnitPretest_ThrowParty			f	f	f	0	Comment
+UnitPretest_CanCauseUnhappiness		f	f	f	0	Comment
+UnitPretest_CanPlantNuke		f	f	f	0	Comment
+UnitPretest_CanSlaveRaid		f	f	f	0	Comment
+UnitPretest_CanEnslaveSettler		f	f	f	0	Comment
+UnitPretest_CanUndergroundRailway	f	f	f	0	Comment
+UnitPretest_CanInciteUprising		f	f	f	0	Comment
+UnitPretest_CanBioTerror		f	f	f	0	Comment
+UnitPretest_CanPlague			f	f	f	0	Comment
+UnitPretest_CanNanoInfect		f	f	f	0	Comment
+UnitPretest_CanConvertCity		f	f	f	0	Comment
+UnitPretest_CanReformCity		f	f	f	0	Comment
+UnitPretest_CanSellIndulgences		f	f	f	0	Comment
+UnitPretest_CanFaithHeal		f	f	f	0	Comment
+UnitPretest_CanSoothsay			f	f	f	0	Comment
+UnitPretest_CanCreatePark		f	f	f	0	Comment
+UnitPretest_CanPillage			f	f	f	0	Comment
+UnitPretest_CanInjoin			f	f	f	0	Comment
+UnitPretest_CanInterceptTrade		f	f	f	0	Comment
+UnitPretest_CanAdvertise		f	f	f	0	Comment
+UnitPretest_CanNukeCity			f	f	f	0	Comment
+UnitPretest_CanTransport		f	f	f	0	Comment
+UnitPretest_CanBeTransported		f	f	f	0	Comment
+UnitPretest_CanLaunch			f	f	f	0	Comment
+UnitPretest_CanTarget			f	f	f	0	Comment
+UnitPretest_Invalid			f	f	f	0	Comment
+Range			f	f	f	1
+	0		0		Comment
+IsTeleport			f	f	f	0	Comment
+IsTarget			f	f	f	0	Comment
+CPIcon			t	t	f	1
+	0		".tga"		Valid *.tga image from ..\ctp2_data\default\graphics\pictures\ or the pic565.zfs files
+ButtonLocation		t	t	f	1
+	0		0		Button location on the orders pad
+DefaultIcon		t	t	f	1
+	uniticon.ces	ICON_%n		Icon id
+Cursor			t	t	f	1
+	0		7		Default value: Default Special Action Cursors 
+InvalidCursor		t	t	f	1
+	0		8		Default value: Default Special Action Cursors 
+FailSound		f	f	f	1
+	sounds.ces	SOUND_		Sound
+Sound			f	f	f	1
+	sounds.ces	SOUND_		Sound
+@ //End of fields
+
+DefaultIcon  //The field which references the GL icon entry in uniticon.txt
+DATABASE_ORDERS //Name of database for GL hyperlinks
+*<ORDER_  //The prefix which identifies this file in gl_str.txt

@@ -1,0 +1,116 @@
+//CTP Editor Structure file
+//For more detailed comments see advance.ces
+
+0.3 //Version number
+
+#%047%047	//Comment charachter in data file
+%032%009	//Delimiter charachters in data file
+		// (use %nnn for ASCII ref)
+:		//Break on right quasi-delimiter
+}{		//Break on left quasi-delimiter
+
+1 // Format
+
+f //Whether this has a number at the top (num of entries)
+t //Whether this has a tree structure
+t //Whether this file references GL entries (see below)
+t //Whether this file has entries in gl_str.txt
+f //Whether the entries have an article
+f //Whether this file is the GL icon file
+f //Whether this structure file describes formatting of fields
+  // (i.e. whether it has the LBF and LAF columns below)
+
+//Name			Comp	PByDef	AMult	NumArgs
+	//Type		DefaultValue	Comment
+DefaultIcon		t	t	f	1
+	uniticon.ces	ICON_%n		Icon ID to be used for this building. Must be a valid Icon ID from UnitIcon.txt 
+Description		t	t	f	1
+	0		DESCRIPTION_IMPROVE_ACADEMY	This string is not used within the game but must reference a valid String ID from one of the string files.  
+EnableAdvance		f	t	f	1
+	advance.ces	ADVANCE_	Advance ID that enables construction of this building. Must be a valid Advance ID from Advance.txt 
+ObsoleteAdvance		f	f	f	1
+	advance.ces	ADVANCE_	Advance ID that renders this building obsolete. Up to 5 ObsoleteAdvances can be defined. Must be a valid Advance ID from Advance.txt 
+PrerequisiteBuilding	f	f	t	1
+	buildings.ces	IMPROVE_	Building ID of building that must be built before this building can be contructed. Any number of PrerequisiteBuildings can be defined. 
+ProductionCost		t	t	f	1
+	0		1000		Production cost to build this building 
+Upkeep			t	t	f	1
+	0		10		Commerce cost to maintain this building 
+
+DefendersPercent	f	f	f	1
+	0		15		Amount to add to Defense rating of unit's garrisoned in city with this building. NOTE: This is not a percent but a flat amount added. 
+HappyInc		f	f	f	1
+	0		1		Amount to raise Happiness in cities with this building 
+ProductionPercent	f	f	f	1
+	0		0.15		Fraction to increase Production output 
+FoodPercent		f	f	f	1
+	0		0.15		Fraction to increase Food output 
+CommercePercent		f	f	f	1
+	0		0.15		Fraction to increase Gold output. NOTE: This actually effects only Gold output not Commerce. 
+SciencePercent		f	f	f	1
+	0		0.15		Fraction to increase Science output 
+FoodVat			f	f	f	1
+	0		1		Set the building as food vat. The value defines the amount of pollution produced per unit of food created. 
+LowerCrime		f	f	f	1
+	0		-0.1		Fraction to modify Crime. NOTE: This value is an INCREASE. 
+PreventConversion	f	f	f	1
+	0		0.4		Chance of stopping a foreign religious unit from converting this city. Valid values: 0.0 - 1.0 
+PreventSlavery		f	f	f	1
+	0		0.4		Chance of stopping foreign slavers from Slave Raiding this city. Valid values: 0.0 - 1.0 
+LowerPeaceMovement	f	f	f	1
+	0		-0.2		Modifier to the War Discontent amount. NOTE: This value is an INCREASE. 
+GoldPerCitizen		f	f	f	1
+	0		1		Amount of Gold per citizen this building generates. 
+ProtectFromBioAgents	f	f	f	1
+	0		0.5		Chance of stopping Infector attacks on this city. Valid values: 0.0 - 1.0 
+ProtectFromNanoVirus	f	f	f	1
+	0		0.5		Chance of stopping Eco-Terrorist attacks on this city. Valid values: 0.0 - 1.0 
+SciencePerPop		f	f	f	1
+	0		1		Amount of Science per citizen this building generates 
+RaiseOvercrowdingLevel	f	f	f	1
+	0		1		Amount to increase the level where overcrowding begins. 
+RaiseMaxPopulation	f	f	f	1
+	0		1		Amount to increase the maximum population 
+StarvationProtection	f	f	f	1
+	0		5		Number of turns this building can prevent starvation. 
+OffenseBonusLand	f	f	f	1
+	0		20		Amount to add to Attack rating of unit's garrisoned within this city when attacking land units 
+OffenseBonusWater	f	f	f	1
+	0		20		Amount to add to Attack rating of unit's garrisoned within this city when attacking naval units 
+OffenseBonusAir		f	f	f	1
+	0		20		Amount to add to Attack rating of unit's garrisoned within this city when attacking aerial units 
+PopulationPollutionPercent	f	f	f	1
+	0		0.5		Fraction to modify pollution created by population.
+ProductionPollutionPercent	f	f	f	1
+	0		0.5		Fraction to modify pollution created by production. 
+PollutionAmount		f	f	f	1
+	0		0		Flat amount of pollution created by this building 
+Capitol			f	f	f	0	This building set the Capitol city. Only one building can have this flag and it can only exist in one city in the empire. Building a new one will cause the old one to be removed. 
+DoubleTelevangelists	f	f	f	0	This building causes Televangelists to have twice the change of succeeding against the host city. 
+Airport			f	f	f	0	This building is an airport. 
+NoUnhappyPeople		f	f	f	0	This building prevent people from becoming unhappy 
+NoRushBuyPenalty	f	f	f	0	This building removes the RushBuy penalty 
+AllowGrunts		f	f	f	0	This flag is not used by the game. 
+ProtectFromNukes	f	f	f	0	This building protects the city from nuclear strikes. 
+Television		f	f	f	0	This building is a Television. 
+CityWalls		f	f	f	0	This building is a City Wall 
+IsReligious		f	f	f	0	This building is a religious building 
+ForceField		f	f	f	0	This building is a Force Field 
+CantBuildInSea		f	f	f	0	This building cannot be built in Ocean Cities 
+CantBuildOnLand		f	f	f	0	This building cannot be built in Land Cities 
+Cathedral		f	f	f	0	This building is a Cathedral 
+Brokerage		f	f	f	0	This building is a Brokerage 
+NuclearPlant		f	f	f	0	This building is a Nuclear Plant 
+CoastalBuilding		f	f	f	0	This building can only be built in coastal cities 
+GLHidden		f	f	f	0	This flag causes this building to not be displayed in the Great Library 
+@ //End of fields
+
+PrerequisiteBuilding
+
+//Stuff on the right
+(I)	buildings.ces	PrerequisiteBuilding
+@
+
+DefaultIcon //GL icon field
+DATABASE_BUILDINGS //Name of database for GL hyperlinks
+IMPROVE_  //The prefix which identifies this file in gl_str.txt

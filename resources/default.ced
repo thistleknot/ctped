@@ -1,0 +1,103 @@
+//This is the default project file
+//Do not save over this or open it as a project
+
+//Version
+0.3
+
+PRJ_		//Prefix
+Project Title	//Title
+//(Comment & delimiter charachters no longer stored in project file
+// they should now be set in the structure file)
+//#		//Comment charachter in data files
+//%032%009	//Delimiter charachters in data files
+		// (use %nnn for ASCII ref)
+//:		//Break on right quasi-delimiter
+//}{		//Break on left quasi-delimiter
+
+//Name and location of three unique files
+
+PRJ_Gamefile.txt	%cdefault\gamedata\
+//Newsprite used to be defined here, now it's down below...
+//PRJ_Newsprite.txt	%cdefault\gamedata\
+PRJ_Great_Library.txt	%c%l\gamedata\
+
+//Names and locations of all the other data files and their associated structure files
+// null\ for the structure file path indicates that no structure file exists,
+//       but the structure file name must still be unique
+// In the paths:
+//  %s refers to the structure file path
+//  %c refers to the ctp_data path
+//  %l refers to the language
+
+// The last three columns are:
+//  Whether this file is editable by default
+//  Whether this file is listed after the name in the *_gamefile.txt
+//  Duplication - if this file is duplicated, how many copies, otherwise 0
+
+%s	strings.ces		%c%l\gamedata\		strings.txt		f	f	0
+%s	sounds.ces		%cdefault\gamedata\	sounds.txt		f	f	0
+%s	Const.ces		%cdefault\gamedata\	Const.txt		f	f	0
+%s	age.ces			%cdefault\gamedata\	age.txt			f	f	0
+null\	throne.ces		%cdefault\gamedata\	throne.txt		f	f	0
+null\	terrainicon.ces		%cdefault\gamedata\	terrainicon.txt		f	f	0
+%s	terrain.ces		%cdefault\gamedata\	terrain.txt		f	f	0
+null\	advanceicon.ces		%cdefault\gamedata\	advanceicon.txt		f	f	0
+%s	advance.ces		%cdefault\gamedata\	advance.txt		f	f	0
+%s	concept.ces		%cdefault\gamedata\	concept.txt		f	f	0
+null\	concepticon.ces		%cdefault\gamedata\	concepticon.txt		f	f	0
+%s	tileimp.ces		%cdefault\gamedata\	tileimp.txt		f	f	0
+null\	tileimpicon.ces		%cdefault\gamedata\	tileimpicon.txt		f	f	0
+null\	spriteID.ces		%cdefault\gamedata\	spriteID.txt		f	f	0
+%s	speceffectid.ces	%cdefault\gamedata\	speceffectid.txt	f	f	0
+null\	specattack.ces		%cdefault\gamedata\	specattack.txt		f	f	0
+null\	goodsID.ces		%cdefault\gamedata\	goodsID.txt		f	f	0
+null\	cityID.ces		%cdefault\gamedata\	cityID.txt		f	f	0
+null\	branchID.ces		%cdefault\gamedata\	branchID.txt		f	f	0
+%s	uniticon.ces		%cdefault\gamedata\	PRJ_uniticon.txt	t	f	0
+%s	units.ces		%cdefault\gamedata\	units.txt		f	f	0
+%s	wonder.ces		%cdefault\gamedata\	wonder.txt		f	f	0
+null\	wondericon.ces		%cdefault\gamedata\	wondericon.txt		f	f	0
+%s	wondermovie.ces		%cdefault\gamedata\	wondermovie.txt		f	f	0
+null\	victorymovie.ces	%cdefault\gamedata\	victorymovie.txt	f	f	0
+%s	buildings.ces		%cdefault\gamedata\	buildings.txt		f	f	0
+null\	improveicon.ces		%cdefault\gamedata\	improveicon.txt		f	f	0
+null\	pollution.ces		%cdefault\gamedata\	pollution.txt		f	f	0
+null\	gw.ces			%cdefault\gamedata\	gw.txt			f	f	0
+null\	ozone.ces		%cdefault\gamedata\	ozone.txt		f	f	0
+%s	govern.ces		%cdefault\gamedata\	govern.txt		f	f	0
+null\	governicon.ces		%cdefault\gamedata\	governicon.txt		f	f	0
+%s	Pop.ces			%cdefault\gamedata\	Pop.txt			f	f	0
+null\	DiffDB.ces		%cdefault\gamedata\	DiffDB.txt		f	f	0
+null\	installations.ces	%s			installations.txt	f	f	0
+null\	civilisation.ces	%cdefault\gamedata\	civilisation.txt	f	f	0
+null\	script.ces		%cdefault\gamedata\	script.slc		f	f	0
+null\	tutorial.ces		%cdefault\gamedata\	tutorial.slc		f	f	0
+%s	goods.ces		%cdefault\gamedata\	goods.txt		f	f	0
+%s	risks.ces		%cdefault\gamedata\	risks.txt		f	f	0
+null\	endgame.ces		%cdefault\gamedata\	endgame.txt		f	f	0
+null\	endgameicon.ces		%cdefault\gamedata\	endgameicon.txt		f	f	0
+%s	messageicon.ces		%cdefault\gamedata\	messageicon.txt		f	f	0
+null\	goodsicon.ces		%cdefault\gamedata\	goodsicon.txt		f	f	0
+%s	orders.ces		%cdefault\gamedata\	orders.txt		f	f	0
+null\	map.ces			%cdefault\gamedata\	map.txt			f	f	0
+null\	playlist.ces		%cdefault\gamedata\	playlist.txt		f	f	0
+null\	squadclasses.ces	%s			squadclasses.txt	f	f	0
+null\	goals.ces		%cdefault\aidata\	goals.txt		f	f	0
+null\	wonderbuildlists.ces	%cdefault\aidata\	wonderbuildlists.txt	f	f	0
+null\	buildingbuildlists.ces	%cdefault\aidata\	buildingbuildlists.txt	f	f	0
+null\	unitbuildlists.ces	%cdefault\aidata\	unitbuildlists.txt	f	f	0
+null\	improvementlists.ces	%cdefault\aidata\	improvementlists.txt	f	f	0
+null\	strategies.ces		%cdefault\aidata\	strategies.txt		f	f	0
+null\	buildlistsequences.ces	%cdefault\aidata\	buildlistsequences.txt	f	f	0
+null\	diplomacy.ces		%cdefault\aidata\	diplomacy.txt		f	f	0
+%s	citysize.ces		%cdefault\gamedata\	citysize.txt		f	f	6
+null\	diplomacyproposal.ces	%cdefault\aidata\	diplomacyproposal.txt	f	f	0
+null\	diplomacythreat.ces	%cdefault\aidata\	diplomacythreat.txt	f	f	0
+null\	advancelists.ces	%cdefault\aidata\	advancelists.txt	f	f	0
+null\	personalities.ces	%cdefault\aidata\	personalities.txt	f	f	0
+%s	feat.ces		%cdefault\gamedata\	feat.txt		f	f	0
+%s	endgameobjects.ces	%cdefault\gamedata\	endgameobjects.txt	f	f	0
+%s	citystyle.ces		%cdefault\gamedata\	citystyle.txt		f	f	0
+%s	agecitystyle.ces	%cdefault\gamedata\	agecitystyle.txt	f	f	0
+%s	Newsprite.ces		%cdefault\gamedata\	PRJ_Newsprite.txt	t	t	0
+@ //End of files

@@ -1,0 +1,33 @@
+//CTP Editor Structure file
+//For more detailed comments see advance.ces
+
+0.3 //Version number
+
+#%047%047	//Comment charachter in data file
+%032%009	//Delimiter charachters in data file
+		// (use %nnn for ASCII ref)
+:		//Break on right quasi-delimiter
+}{		//Break on left quasi-delimiter
+
+1 //Format
+
+f //Whether this has a number at the top (num of entries)
+f //Whether this has a tree structure
+f //Whether this file references GL entries
+f //Whether this file has entries in gl_str.txt
+f //Whether this file is the GL icon file
+f //Whether this structure file describes formatting of fields
+  // (i.e. whether it has the LBF and LAF columns below)
+
+//Name			Comp	PByDef	AMult	NumArgs
+	//Type		DefaultValue	Comment
+Age			t	t	f	1
+	0		1		Age number
+StartingRound		t	t	f	1
+	0		0		Base turn number that this age can be entered
+NeedAdvances		t	t	f	1
+	0		0		Number of advances from this age that must be known to trigger this age
+SlicObject		t	t	f	1
+	0		"Age1Entered"	SlicObject of the message to display when age is entered. Must be a valid SlicObject from Script.slc
+@ //End of fields
+

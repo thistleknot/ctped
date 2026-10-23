@@ -1,0 +1,46 @@
+//CTP Editor Structure file for EndGameObjects by Martin Gühmann
+//Spelling corrections & other small changes, updated by JB
+//For more detailed comments see advance.ces
+
+0.3 //Version number
+
+#%047%047	//Comment charachter in data file
+%032%009	//Delimiter charachters in data file
+		// (use %nnn for ASCII ref)
+:		//Break on right quasi-delimiter
+}{		//Break on left quasi-delimiter
+
+1 //Format
+
+f //Whether this has a number at the top (num of entries)
+f //Whether this has a tree structure
+f //Whether this file references GL entries
+f //Whether this file has entries in gl_str.txt
+f //Whether this file is the GL icon file
+f //Whether this structure file describes formatting of fields
+  // (i.e. whether it has the LBF and LAF columns below)
+
+//Name				Comp	PByDef	AMult	NumArgs
+	//Type			DefaultValue	Comment
+Wonder				f	f	f	1
+	wonder.ces		WONDER_		Wonder that should be needed to complete the endgame.  Actually I finished it without the wonder and the game crashes after the activation of the gaia controller sequence when the wonder was build.
+Building			f	f	f	1
+	buildings.ces		IMPROVE_	City building you need to activate the endgame.
+TerrainImprovement		f	f	f	1
+	tileimp.ces		TILEIMP_	Terrain improvement you need to activate the endgame.
+MinNeeded			f	f	f	1
+	0			10		Minimum of buildings or terrain improvements needed to activate the endgame.
+MaxNeeded			f	f	f	1
+	0			20		Maximum number of buildings of the end game that can be build.
+IsSatellite			f	f	f	0	Is it a Satellite?  Not used in default EndGameObjects
+PowerSource			f	f	f	1
+	EndGameObjects.ces	ENDGAME_	The power source from this file for the terrain improvements to increase their coverrage.
+MinRadius			f	f	f	1
+	0			5		Minimum coverrage radius of the tile improvements.
+MaxRadius			f	f	f	1
+	0			8		Maximum coverrage radius of the tile improvements.
+MinCoverage			f	f	f	1
+	0			0.6		Minum map coverrage in order to launch the end game.
+TurnsToActivate			f	f	f	1
+	0			10		The number of turns to activation of the endgame from launch.
+@ //End of fields

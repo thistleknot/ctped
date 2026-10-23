@@ -1,0 +1,25 @@
+//CTP Editor SubStructure file
+//For more detailed comments see advance.ces
+
+0.3 //Version number
+
+1 //Format
+
+f //Whether this has a number at the top (num of fields)
+f //Whether this has a tree structure
+f //Whether this file references GL entries
+f //Whether this file has entries in gl_str.txt
+f //Whether this file is the GL icon file
+f //Whether this structure file describes formatting of fields
+  // (i.e. whether it has the LBF and LAF columns below)
+
+//Name			Comp	PByDef	AMult	NumArgs
+	//Type		DefaultValue	Comment
+Building		t	t	f	1
+	buildings.ces	IMPROVE_	Type of building that must be built. Must be valid Building Id from Building.txt 
+Num			f	t	f	1
+	0		10		Number of buildings that must be built 
+PercentCitiesNum	f	f	f	1
+	0		0		Percentage of cities that must contain the needed building. Valid values: 0 - 100 
+@ //End of fields
+
